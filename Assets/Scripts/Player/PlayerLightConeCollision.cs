@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class PlayerLightConeCollisionController : MonoBehaviour
+public class PlayerLightConeCollision : MonoBehaviour
 {
     private Coroutine colorChangeCoroutine;
     private float elapsedTime;

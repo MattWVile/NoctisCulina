@@ -49,7 +49,7 @@ private void OnTriggerEnter2D(Collider2D collision)
     {
         playerCurrentHealth -= collision.gameObject.GetComponent<Zombie>().Damage;
 
-        var playerLightCircleCollisionController = FindObjectOfType<PlayerLightCircleCollisionController>();
+        var playerLightCircleCollisionController = FindObjectOfType<PlayerLightCircleCollision>();
         if (playerLightCircleCollisionController != null)
         {
             if (playerCurrentHealth <= 0)
