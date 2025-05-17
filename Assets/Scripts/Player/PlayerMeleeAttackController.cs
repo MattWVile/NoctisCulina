@@ -14,7 +14,6 @@ public class PlayerMeleeAttackController : MonoBehaviour
     void Update()
     {
         HandleMeleeAttack();
-        // If you have other attack types (e.g., ranged), you can handle them here as well.
     }
 
     private void HandleMeleeAttack()
