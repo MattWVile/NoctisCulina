@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class PlayerAttackController : MonoBehaviour
+public class PlayerMeleeAttackController : MonoBehaviour
 {
     public GameObject topCollider;
     public GameObject leftCollider;
@@ -40,12 +40,13 @@ public class PlayerAttackController : MonoBehaviour
         }
     }
 
-    private IEnumerator PerformAttack(GameObject collider)
+    private IEnumerator PerformAttack(GameObject colliderGameObject)
     {
         canAttack = false;
-        collider.SetActive(true); // Enable the collider for the attack
+        Collider2D attackCollider = colliderGameObject.GetComponent<PolygonCollider2D>(); // Get the collider component
+        attackCollider.enabled = true; // Enable the collider for the attack
         yield return new WaitForSeconds(0.1f); // Keep the collider active for a short duration
-        collider.SetActive(false); // Disable the collider after the attack
+        attackCollider.enabled = false; // Disable the collider after the attack
         yield return new WaitForSeconds(attackCooldown - 0.1f); // Wait for the cooldown
         canAttack = true;
     }

@@ -14,9 +14,9 @@ public abstract class Enemy : MonoBehaviour
         CurrentHealth = TotalHealth;
     }
 
-    public virtual void TakeDamage(float amount)
+    public virtual void TakeDamage(float damageAmount)
     {
-        CurrentHealth -= amount;
+        CurrentHealth -= damageAmount;
         Debug.Log("Current Health: " + CurrentHealth);
         if (CurrentHealth <= 0)
         {
@@ -24,28 +24,15 @@ public abstract class Enemy : MonoBehaviour
         }
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    private void AddScore(int score)
     {
-        if (other.CompareTag("Projectile"))
+        if (ScoreController.Instance != null)
         {
-            // Get the base damage from the projectile script attached to the projectile
-            Projectile projectile = other.GetComponent<Projectile>();
-
-            if (projectile != null)
-            {
-                float projectileBaseDamage = projectile.BaseDamage;
-                float parentGunBaseDamage = projectile.ParentGun.GetComponent<Pistol>().BaseDamage;
-                TakeDamage(parentGunBaseDamage + projectileBaseDamage);
-                projectile.HandleCollisionWithEnemy(transform.gameObject.GetComponent<Collider2D>());
-                if (ScoreController.Instance != null)
-                {
-                    ScoreController.Instance.AddScore(100);
-                }
-                else
-                {
-                    Debug.LogError("ScoreController instance not found.");
-                }
-            }
+            ScoreController.Instance.AddScore(score);
+        }
+        else
+        {
+            Debug.LogError("ScoreController instance not found.");
         }
     }
 

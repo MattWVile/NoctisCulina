@@ -13,7 +13,6 @@ public class PlayerHealthController : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // Optional: Keep the PlayerHealthController across scenes
         }
         else
         {
@@ -25,6 +24,7 @@ public class PlayerHealthController : MonoBehaviour
     {
         get { return playerCurrentHealth <= 0; }
     }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -43,38 +43,41 @@ public class PlayerHealthController : MonoBehaviour
         }
     }
 
-private void OnTriggerEnter2D(Collider2D collision)
-{
-    if (collision.gameObject.CompareTag("Enemy"))
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        playerCurrentHealth -= collision.gameObject.GetComponent<Zombie>().Damage;
-
-        var playerLightCircleCollisionController = FindObjectOfType<PlayerLightCircleCollision>();
-        if (playerLightCircleCollisionController != null)
+        if (collision.gameObject.CompareTag("Enemy"))
         {
-            if (playerCurrentHealth <= 0)
+            playerCurrentHealth -= collision.gameObject.GetComponent<Zombie>().Damage;
+
+            var playerLightCircleCollisionController = FindObjectOfType<PlayerLightCircleCollision>();
+            if (playerLightCircleCollisionController != null)
             {
-                playerCurrentHealth = 0; // Ensure health doesn't go below zero
-                RemoveHeart(); // Remove the last heart
-                               // You can add logic here to restart the game or show a game over screen
-            }
-            else
-            {
-                RemoveHeart();
-            }
-            // Create a copy of the enemies list to iterate over
-            var enemiesCopy = new List<GameObject>(playerLightCircleCollisionController.enemiesInCircle);
-            foreach (var enemy in enemiesCopy)
-            {
-                if (enemy != null)
+                if (playerCurrentHealth <= 0)
                 {
-                    enemy.GetComponent<Zombie>().Die();
+                    playerCurrentHealth = 0; // Ensure health doesn't go below zero
+                    RemoveHeart(); // Remove the last heart
+                                   // You can add logic here to restart the game or show a game over screen
                 }
+                else
+                {
+                    RemoveHeart();
+                }
+
+                // Create a copy of the enemies list to iterate over
+                var enemiesCopy = new List<GameObject>(playerLightCircleCollisionController.enemiesInCircle);
+                foreach (var enemy in enemiesCopy)
+                {
+                    if (enemy != null && enemy.GetComponent<Zombie>() != null)
+                    {
+                        enemy.GetComponent<Zombie>().Die();
+                    }
+                }
+
+                // Remove destroyed enemies from the original list
+                playerLightCircleCollisionController.enemiesInCircle.RemoveAll(enemy => enemy == null);
             }
         }
     }
-}
-
 
     private void RemoveHeart()
     {
@@ -90,6 +93,7 @@ private void OnTriggerEnter2D(Collider2D collision)
             Destroy(heartToRemove);
         }
     }
+
     public void Heal(float amount)
     {
         playerCurrentHealth += amount;
@@ -99,21 +103,4 @@ private void OnTriggerEnter2D(Collider2D collision)
         }
         Debug.Log("Player healed! Current health: " + playerCurrentHealth);
     }
-    //public void ResetHealth()
-    //{
-    //    playerCurrentHealth = playerMaxHealth;
-    //    Debug.Log("Player health reset to max: " + playerMaxHealth);
-    //    // Optionally, you can also respawn the hearts here if needed
-    //    foreach (GameObject heart in hearts)
-    //    {
-    //        Destroy(heart);
-    //    }
-    //    hearts.Clear();
-    //    for (int i = 0; i < playerMaxHealth; i++)
-    //    {
-    //        GameObject newHeart = Instantiate(heartPrefab, transform.position, Quaternion.identity);
-    //        hearts.Add(newHeart);
-    //    }
-    //}
-
 }

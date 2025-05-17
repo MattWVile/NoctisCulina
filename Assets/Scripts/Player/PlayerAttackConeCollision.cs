@@ -2,19 +2,9 @@ using UnityEngine;
 
 public class PlayerAttackConeCollision : MonoBehaviour
 {
-    public int damageAmount = 10; // Amount of damage to deal
+    public int damageAmount = 11; // Amount of damage to deal
 
     private void OnTriggerEnter2D(Collider2D collision)
-    {
-        TriggerEnterAndStayLogic(collision);
-    }
-
-    private void OnTriggerStay2D(Collider2D collision)
-    {
-        TriggerEnterAndStayLogic(collision);
-    }
-
-    private void TriggerEnterAndStayLogic(Collider2D collision)
     {
         if (collision.CompareTag("Enemy"))
         {
@@ -22,7 +12,20 @@ public class PlayerAttackConeCollision : MonoBehaviour
             if (enemy != null)
             {
                 enemy.TakeDamage(damageAmount); // Apply damage
+                AddScore(250);
             }
+        }
+    }
+
+    private void AddScore(int score)
+    {
+        if (ScoreController.Instance != null)
+        {
+            ScoreController.Instance.AddScore(score);
+        }
+        else
+        {
+            Debug.LogError("ScoreController instance not found.");
         }
     }
 }
