@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class PlayerLightCircleCollisionController : MonoBehaviour
+public class PlayerLightCircleCollision : MonoBehaviour
 {
     public List<GameObject> enemiesInCircle;  
     private void OnTriggerEnter2D(Collider2D collision)

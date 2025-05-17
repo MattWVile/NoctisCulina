@@ -102,6 +102,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationSpeed: 7
+  moveSpeed: 5
+  currentRotation: {x: 0, y: 0, z: 0, w: 0}
 --- !u!114 &7886154730009320699
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -257,6 +259,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a62f875def3ed54b86e8f031a977ca3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  originalColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &4717851370527150848
 GameObject:
   m_ObjectHideFlags: 0

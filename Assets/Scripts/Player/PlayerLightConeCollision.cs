@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class PlayerLightConeCollisionController : MonoBehaviour
+public class PlayerLightConeCollision : MonoBehaviour
 {
     private Coroutine colorChangeCoroutine;
     private float elapsedTime;
@@ -24,13 +24,14 @@ public class PlayerLightConeCollisionController : MonoBehaviour
             if (zombie != null)
             {
                 SetEnemySpeedToZero(zombie);
-                if (!zombie.GetComponent<SpriteRenderer>().enabled)
+                SpriteRenderer spriteRenderer = zombie.GetComponent<SpriteRenderer>();
+                if (spriteRenderer != null && !spriteRenderer.enabled)
                 {
                     zombie.ToggleSpriteRenderer();
                 }
-                if (colorChangeCoroutine == null && zombie.GetComponent<SpriteRenderer>().color != Color.yellow)
+                if (spriteRenderer != null && colorChangeCoroutine == null && spriteRenderer.color != Color.yellow)
                 {
-                    colorChangeCoroutine = StartCoroutine(ChangeColorOverTime(zombie.GetComponent<SpriteRenderer>(), zombie.GetComponent<SpriteRenderer>().color, Color.yellow, 1f - elapsedTime));
+                    colorChangeCoroutine = StartCoroutine(ChangeColorOverTime(spriteRenderer, spriteRenderer.color, Color.yellow, 1f - elapsedTime));
                 }
             }
         }
@@ -44,7 +45,8 @@ public class PlayerLightConeCollisionController : MonoBehaviour
             if (zombie != null)
             {
                 zombie.CurrentSpeed = zombie.MaxSpeed; // Reset speed when exiting the light cone
-                if (zombie.GetComponent<SpriteRenderer>().enabled)
+                SpriteRenderer spriteRenderer = zombie.GetComponent<SpriteRenderer>();
+                if (spriteRenderer != null && spriteRenderer.enabled)
                 {
                     zombie.ToggleSpriteRenderer(1f);
                 }
@@ -75,11 +77,22 @@ public class PlayerLightConeCollisionController : MonoBehaviour
         float startTime = Time.time;
         while (Time.time - startTime < duration)
         {
+            if (spriteRenderer == null || spriteRenderer.gameObject == null)
+            {
+                // Exit the coroutine if the SpriteRenderer or its GameObject is destroyed
+                yield break;
+            }
+
             float t = (Time.time - startTime) / duration;
             spriteRenderer.color = Color.Lerp(startColor, endColor, t);
             yield return null;
         }
-        spriteRenderer.color = endColor; // Ensure the final color is set
+
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.color = endColor; // Ensure the final color is set
+        }
+
         colorChangeCoroutine = null; // Reset the coroutine reference
         ScoreController.Instance.AddScore(300); // Add score when the color change is complete
     }
