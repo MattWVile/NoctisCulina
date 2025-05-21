@@ -1,27 +1,66 @@
 using UnityEngine;
+using UnityEngine.UI; // Add this line if using Text
 
 public class EnemySpawner : MonoBehaviour
 {
     public GameObject zombiePrefab; // Reference to the zombie prefab
     public float spawnInterval = 5.0f; // Time interval between spawns
-    private float timer;
+    public float toggleTimer = 50.0f; // Time interval to automatically toggle spawning
+    public KeyCode toggleKey = KeyCode.T; // Key to manually toggle spawning
+
+    private float spawnTimer;
+    private float toggleTimerCountdown;
+    public bool spawningEnabled = true; // Flag to control whether spawning is enabled
+
+    public Text waveTimerText; // Use this if using Text
 
     void Start()
     {
-        timer = spawnInterval;
+        spawnTimer = spawnInterval;
+        toggleTimerCountdown = toggleTimer;
     }
 
     void Update()
     {
-        timer -= Time.deltaTime;
-        if (timer <= 0)
+        // Handle manual toggle with a key press
+        if (Input.GetKeyDown(toggleKey))
         {
-            SpawnZombie();
-            timer = spawnInterval;
+            spawningEnabled = !spawningEnabled;
+            Debug.Log("Spawning toggled: " + (spawningEnabled ? "Enabled" : "Disabled"));
+        }
+
+        // Handle automatic toggle on a timer
+        toggleTimerCountdown -= Time.deltaTime;
+        if (waveTimerText != null)
+        {
+            waveTimerText.text = "Wave Timer: " + Mathf.Ceil(toggleTimerCountdown).ToString();
+        }
+        if (toggleTimerCountdown <= 0)
+        {
+            spawningEnabled = !spawningEnabled;
+            Debug.Log("Spawning automatically toggled: " + (spawningEnabled ? "Enabled" : "Disabled"));
+            toggleTimerCountdown = toggleTimer; // Reset the toggle timer
+        }
+
+        // Only spawn enemies if spawning is enabled
+        if (spawningEnabled)
+        {
+            spawnTimer -= Time.deltaTime;
+            if (spawnTimer <= 0)
+            {
+                SpawnZombie();
+                spawnTimer = spawnInterval; // Reset the spawn timer
+            }
         }
     }
 
     void SpawnZombie()
+    {
+        Vector3 spawnPosition = GetRandomSpawnPosition();
+        Instantiate(zombiePrefab, spawnPosition, Quaternion.identity);
+    }
+
+    Vector3 GetRandomSpawnPosition()
     {
         // Get the camera bounds
         Camera mainCamera = Camera.main;
@@ -61,7 +100,6 @@ public class EnemySpawner : MonoBehaviour
                 break;
         }
 
-        // Instantiate the zombie prefab at the spawn position
-        Instantiate(zombiePrefab, spawnPosition, Quaternion.identity);
+        return spawnPosition;
     }
 }

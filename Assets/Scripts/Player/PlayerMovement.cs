@@ -7,10 +7,27 @@ public class PlayerMovement : MonoBehaviour
 
     public Quaternion currentRotation;
 
+    private EnemySpawner enemySpawner;
+
+    void Start()
+    {
+        // Find the EnemySpawner in the scene
+        enemySpawner = FindObjectOfType<EnemySpawner>();
+        if (enemySpawner == null)
+        {
+            Debug.LogWarning("EnemySpawner not found in the scene. Player movement will not be restricted.");
+        }
+    }
+
     void Update()
     {
         RotateLightTowardsMouse();
-        //MovePlayer();
+
+        // Only allow movement if spawning is disabled
+        if (!enemySpawner.spawningEnabled)
+        {
+            MovePlayer();
+        }
     }
 
     void RotateLightTowardsMouse()
