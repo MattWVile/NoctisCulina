@@ -1,10 +1,16 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class PlayerLightConeCollision : MonoBehaviour
 {
-    private Coroutine colorChangeCoroutine;
-    private float elapsedTime;
+    [SerializeField]
+    private float timeToDeactivateSprite = .7f; // Default to 1 second
+
+    private float colorChangeDuration = 1.5f; // Default to 1 second
+
+    private Dictionary<Zombie, Coroutine> colorChangeCoroutines = new Dictionary<Zombie, Coroutine>();
+    private Dictionary<Zombie, float> elapsedTimes = new Dictionary<Zombie, float>();
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -29,9 +35,18 @@ public class PlayerLightConeCollision : MonoBehaviour
                 {
                     zombie.ToggleSpriteRenderer();
                 }
-                if (spriteRenderer != null && colorChangeCoroutine == null && spriteRenderer.color != Color.yellow)
+
+                if (spriteRenderer != null && !colorChangeCoroutines.ContainsKey(zombie))
                 {
-                    colorChangeCoroutine = StartCoroutine(ChangeColorOverTime(spriteRenderer, spriteRenderer.color, Color.yellow, 1f - elapsedTime));
+                    // Reset elapsed time if the enemy is not already transitioning
+                    if (!elapsedTimes.ContainsKey(zombie))
+                    {
+                        elapsedTimes[zombie] = 0f;
+                    }
+
+                    // Start the color change coroutine
+                    Coroutine coroutine = StartCoroutine(ChangeColorOverTime(zombie, spriteRenderer, spriteRenderer.color, Color.yellow, colorChangeDuration - elapsedTimes[zombie]));
+                    colorChangeCoroutines[zombie] = coroutine;
                 }
             }
         }
@@ -46,16 +61,34 @@ public class PlayerLightConeCollision : MonoBehaviour
             {
                 zombie.CurrentSpeed = zombie.MaxSpeed; // Reset speed when exiting the light cone
                 SpriteRenderer spriteRenderer = zombie.GetComponent<SpriteRenderer>();
-                if (spriteRenderer != null && spriteRenderer.enabled)
+                if (spriteRenderer != null && spriteRenderer.enabled && !zombie.IsColorFullyChanged)
                 {
-                    zombie.ToggleSpriteRenderer(1f);
+                    zombie.ToggleSpriteRenderer(timeToDeactivateSprite);
                 }
-                if (colorChangeCoroutine != null)
+
+                // Check if the coroutine exists before stopping it
+                if (colorChangeCoroutines.ContainsKey(zombie))
                 {
-                    StopCoroutine(colorChangeCoroutine);
-                    colorChangeCoroutine = null;
+                    Coroutine coroutine = colorChangeCoroutines[zombie];
+                    if (coroutine != null)
+                    {
+                        StopCoroutine(coroutine);
+                    }
+                    colorChangeCoroutines.Remove(zombie);
                 }
-                elapsedTime = 1f - (1f - elapsedTime); // Store the remaining time
+
+                // Store the remaining time if the color is not fully changed
+                if (!zombie.IsColorFullyChanged)
+                {
+                    if (elapsedTimes.ContainsKey(zombie))
+                    {
+                        elapsedTimes[zombie] = Mathf.Clamp01(elapsedTimes[zombie]); // Store the remaining time
+                    }
+                    else
+                    {
+                        elapsedTimes[zombie] = 0f;
+                    }
+                }
             }
         }
     }
@@ -72,10 +105,10 @@ public class PlayerLightConeCollision : MonoBehaviour
         }
     }
 
-    private IEnumerator ChangeColorOverTime(SpriteRenderer spriteRenderer, Color startColor, Color endColor, float duration)
+    private IEnumerator ChangeColorOverTime(Zombie zombie, SpriteRenderer spriteRenderer, Color startColor, Color endColor, float duration)
     {
-        float startTime = Time.time;
-        while (Time.time - startTime < duration)
+        float elapsedTime = elapsedTimes.ContainsKey(zombie) ? elapsedTimes[zombie] : 0f;
+        while (elapsedTime < duration)
         {
             if (spriteRenderer == null || spriteRenderer.gameObject == null)
             {
@@ -83,8 +116,10 @@ public class PlayerLightConeCollision : MonoBehaviour
                 yield break;
             }
 
-            float t = (Time.time - startTime) / duration;
+            float t = Mathf.Clamp01(elapsedTime / duration); // Ensure t is always between 0 and 1
             spriteRenderer.color = Color.Lerp(startColor, endColor, t);
+            elapsedTime += Time.deltaTime;
+            elapsedTimes[zombie] = elapsedTime; // Update elapsed time
             yield return null;
         }
 
@@ -93,7 +128,15 @@ public class PlayerLightConeCollision : MonoBehaviour
             spriteRenderer.color = endColor; // Ensure the final color is set
         }
 
-        colorChangeCoroutine = null; // Reset the coroutine reference
-        ScoreController.Instance.AddScore(300); // Add score when the color change is complete
+        colorChangeCoroutines.Remove(zombie); // Remove the coroutine reference
+        elapsedTimes.Remove(zombie); // Remove the elapsed time reference
+
+        // Mark the color as fully changed and add score only once
+        zombie.MarkColorAsFullyChanged();
+        if (!zombie.HasScoreBeenAwarded) // Check if the score has already been awarded
+        {
+            ScoreController.Instance.AddScore(300);
+            zombie.HasScoreBeenAwarded = true; // Mark the score as awarded
+        }
     }
 }

@@ -320,7 +320,7 @@ PolygonCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 120299408}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -436,7 +436,7 @@ PolygonCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 205163215}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -539,7 +539,7 @@ PolygonCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 360168103}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -1125,7 +1125,7 @@ PolygonCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 935860292}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -1372,6 +1372,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4b64f06a043a7544befa6c2b1b3b7c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  timeToDeactivateSprite: 0.7
 --- !u!60 &1282533311
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -1418,8 +1419,8 @@ PolygonCollider2D:
     m_Paths:
     - - {x: 0.04999989, y: 0.4898016}
       - {x: -0.051835455, y: 0.48856008}
-      - {x: -0.5, y: -0.28866667}
-      - {x: 0.5, y: -0.28866667}
+      - {x: -0.45403185, y: -0.2778656}
+      - {x: 0.45403188, y: -0.2738152}
   m_UseDelaunayMesh: 0
 --- !u!1 &1316384804
 GameObject:

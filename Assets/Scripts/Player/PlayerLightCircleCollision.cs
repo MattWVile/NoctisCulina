@@ -26,9 +26,13 @@ public class PlayerLightCircleCollision : MonoBehaviour
     {
         if (collision.CompareTag("Enemy"))
         {
-            if (collision.GetComponent<Zombie>().GetComponent<SpriteRenderer>().enabled == false)
+            Zombie zombie = collision.GetComponent<Zombie>();
+            if (zombie != null && !zombie.IsColorFullyChanged)
             {
-                collision.GetComponent<Zombie>().ToggleSpriteRenderer();
+                if (zombie.GetComponent<SpriteRenderer>().enabled == false)
+                {
+                    zombie.ToggleSpriteRenderer();
+                }
             }
         }
     }
