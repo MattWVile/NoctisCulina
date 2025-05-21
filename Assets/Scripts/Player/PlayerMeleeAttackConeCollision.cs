@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerAttackConeCollision : MonoBehaviour
+public class PlayerMeleeAttackConeCollision : MonoBehaviour
 {
     public int damageAmount = 11; // Amount of damage to deal
 
