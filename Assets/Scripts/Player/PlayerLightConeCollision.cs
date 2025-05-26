@@ -45,12 +45,28 @@ public class PlayerLightConeCollision : MonoBehaviour
                     }
 
                     // Start the color change coroutine
-                    Coroutine coroutine = StartCoroutine(ChangeColorOverTime(zombie, spriteRenderer, spriteRenderer.color, Color.yellow, colorChangeDuration - elapsedTimes[zombie]));
+                    Coroutine coroutine = ColorChangeUtility.ChangeColorOverTime(
+                        this,
+                        spriteRenderer,
+                        spriteRenderer.color,
+                        Color.yellow,
+                        colorChangeDuration - elapsedTimes[zombie],
+                        () =>
+                        {
+                            zombie.MarkColorAsFullyChanged();
+                            if (!zombie.HasScoreBeenAwarded)
+                            {
+                                ScoreController.Instance.AddScore(300);
+                                zombie.HasScoreBeenAwarded = true;
+                            }
+                        }
+                    );
                     colorChangeCoroutines[zombie] = coroutine;
                 }
             }
         }
     }
+
 
     private void OnTriggerExit2D(Collider2D collision)
     {
@@ -102,41 +118,6 @@ public class PlayerLightConeCollision : MonoBehaviour
         if (enemy != null)
         {
             enemy.CurrentSpeed = 0f; // Set speed to zero
-        }
-    }
-
-    private IEnumerator ChangeColorOverTime(Zombie zombie, SpriteRenderer spriteRenderer, Color startColor, Color endColor, float duration)
-    {
-        float elapsedTime = elapsedTimes.ContainsKey(zombie) ? elapsedTimes[zombie] : 0f;
-        while (elapsedTime < duration)
-        {
-            if (spriteRenderer == null || spriteRenderer.gameObject == null)
-            {
-                // Exit the coroutine if the SpriteRenderer or its GameObject is destroyed
-                yield break;
-            }
-
-            float t = Mathf.Clamp01(elapsedTime / duration); // Ensure t is always between 0 and 1
-            spriteRenderer.color = Color.Lerp(startColor, endColor, t);
-            elapsedTime += Time.deltaTime;
-            elapsedTimes[zombie] = elapsedTime; // Update elapsed time
-            yield return null;
-        }
-
-        if (spriteRenderer != null)
-        {
-            spriteRenderer.color = endColor; // Ensure the final color is set
-        }
-
-        colorChangeCoroutines.Remove(zombie); // Remove the coroutine reference
-        elapsedTimes.Remove(zombie); // Remove the elapsed time reference
-
-        // Mark the color as fully changed and add score only once
-        zombie.MarkColorAsFullyChanged();
-        if (!zombie.HasScoreBeenAwarded) // Check if the score has already been awarded
-        {
-            ScoreController.Instance.AddScore(300);
-            zombie.HasScoreBeenAwarded = true; // Mark the score as awarded
         }
     }
 }

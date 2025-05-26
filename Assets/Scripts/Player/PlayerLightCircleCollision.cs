@@ -3,13 +3,14 @@ using System.Collections.Generic;
 
 public class PlayerLightCircleCollision : MonoBehaviour
 {
-    public List<GameObject> enemiesInCircle;  
+    public List<GameObject> enemiesInCircle;
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         TriggerEnterAndStayLogic(collision);
         enemiesInCircle.Add(collision.gameObject);
-
     }
+
     private void OnTriggerStay2D(Collider2D collision)
     {
         TriggerEnterAndStayLogic(collision);
@@ -22,6 +23,7 @@ public class PlayerLightCircleCollision : MonoBehaviour
             enemiesInCircle.Remove(collision.gameObject);
         }
     }
+
     private void TriggerEnterAndStayLogic(Collider2D collision)
     {
         if (collision.CompareTag("Enemy"))
@@ -33,6 +35,21 @@ public class PlayerLightCircleCollision : MonoBehaviour
                 {
                     zombie.ToggleSpriteRenderer();
                 }
+            }
+        }
+    }
+
+    // New method to destroy all nearby enemies
+    public void DestroyAllNearbyEnemies()
+    {
+        List<GameObject> enemiesToDestroy = new List<GameObject>(enemiesInCircle);
+
+        foreach (GameObject enemy in enemiesToDestroy)
+        {
+            if (enemy != null)
+            {
+                Destroy(enemy);
+                enemiesInCircle.Remove(enemy);
             }
         }
     }

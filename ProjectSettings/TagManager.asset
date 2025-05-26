@@ -9,6 +9,7 @@ TagManager:
   - Projectile
   - Heart
   - MeleeAttack
+  - PlayerLightCircle
   layers:
   - Default
   - TransparentFX

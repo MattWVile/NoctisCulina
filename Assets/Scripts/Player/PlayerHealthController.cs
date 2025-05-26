@@ -7,6 +7,11 @@ public class PlayerHealthController : MonoBehaviour
     public float playerMaxHealth = 3f;
     public float playerCurrentHealth;
     private List<GameObject> hearts;
+    public Color colourToFlash = Color.white; // Default color for the light circle
+
+    private SpriteRenderer lightCircleRenderer; // Reference to the light circle's SpriteRenderer
+    private PlayerLightCircleCollision lightCircleCollision; // Reference to the PlayerLightCircleCollision component
+    private Coroutine flashCoroutine; // To manage the flashing coroutine
 
     private void Awake()
     {
@@ -36,6 +41,17 @@ public class PlayerHealthController : MonoBehaviour
                 hearts.Add(child.gameObject);
             }
         }
+
+        GameObject lightCircleObject = GameObject.FindWithTag("PlayerLightCircle");
+        if (lightCircleObject != null)
+        {
+            lightCircleCollision = lightCircleObject.GetComponent<PlayerLightCircleCollision>();
+            lightCircleRenderer = lightCircleObject.GetComponent<SpriteRenderer>();
+        }
+        else
+        {
+            Debug.LogError("No GameObject with the tag 'PlayerLightCircle' found!");
+        }
     }
 
     public void RemoveHeart()
@@ -56,5 +72,43 @@ public class PlayerHealthController : MonoBehaviour
             playerCurrentHealth = playerMaxHealth;
         }
         Debug.Log("Player healed! Current health: " + playerCurrentHealth);
+    }
+
+    // Updated method to handle taking damage
+    public void TakeDamage(float amount)
+    {
+        playerCurrentHealth -= amount;
+
+        if (playerCurrentHealth <= 0)
+        {
+            playerCurrentHealth = 0;
+            Debug.Log("Player is dead!");
+            // Handle player death logic here
+        }
+        else
+        {
+            RemoveHeart(); // Remove a heart when taking damage
+            Debug.Log("Player took damage! Current health: " + playerCurrentHealth);
+
+            // Destroy all nearby enemies when the player takes damage
+            if (lightCircleRenderer != null && lightCircleCollision != null)
+            { 
+                // Flash the player's light circle to red for 1 second
+                if (flashCoroutine != null)
+                {
+                    StopCoroutine(flashCoroutine); // Stop any ongoing flash
+                }
+
+                flashCoroutine = ColorChangeUtility.FlashColorForSeconds(
+                    this,
+                    lightCircleRenderer,
+                    colourToFlash,
+                    .15f,
+                    lightCircleRenderer.color // Reset to the original color
+                );
+
+                lightCircleCollision.DestroyAllNearbyEnemies();
+            }
+        }
     }
 }
