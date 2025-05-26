@@ -123,14 +123,8 @@ public abstract class Gun : MonoBehaviour
         }
     }
 
-    public virtual void FlashColourForSeconds(Color colourToFlash, float secondsToBeColor)
+    private void FlashColourForSeconds(Color colourToFlash, float secondsToBeColor)
     {
-        // Prevent overriding the yellow color during reload
-        if (gunSpriteRenderer.color == Color.yellow && colourToFlash != Color.yellow)
-        {
-            return;
-        }
-
         // Stop any currently running flash coroutine to allow the new flash to take priority
         if (flashCoroutine != null)
         {
@@ -138,23 +132,14 @@ public abstract class Gun : MonoBehaviour
             flashCoroutine = null;
         }
 
-        // Start a new flash coroutine
-        flashCoroutine = StartCoroutine(FlashColourForSecondsCoroutine(colourToFlash, secondsToBeColor));
-    }
-
-    private IEnumerator FlashColourForSecondsCoroutine(Color colourToFlash, float secondsToBeColor)
-    {
-        if (gunSpriteRenderer != null)
-        {
-            gunSpriteRenderer.color = colourToFlash;
-            yield return new WaitForSeconds(secondsToBeColor); // Flash duration
-
-            // Reset to original color unless the gun is still reloading (yellow)
-            if (gunSpriteRenderer.color != Color.yellow)
-            {
-                gunSpriteRenderer.color = originalColor;
-            }
-        }
-        flashCoroutine = null; // Reset the coroutine reference
+        // Use the utility class to flash the color
+        flashCoroutine = ColorChangeUtility.FlashColorForSeconds(
+            this, // Pass the MonoBehaviour (Gun) as the caller
+            gunSpriteRenderer, // The SpriteRenderer to flash
+            colourToFlash, // The color to flash
+            secondsToBeColor, // Duration of the flash
+            originalColor, // The original color to reset to
+            true // Prevent overriding yellow during reload
+        );
     }
 }

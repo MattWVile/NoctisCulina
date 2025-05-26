@@ -39,39 +39,29 @@ public class PlayerMeleeAttackController : MonoBehaviour
         }
     }
 
-    private IEnumerator PerformAttack(GameObject colliderGameObject)
+private IEnumerator PerformAttack(GameObject colliderGameObject)
+{
+    canAttack = false;
+    Collider2D attackCollider = colliderGameObject.GetComponent<PolygonCollider2D>();
+
+    // Get the SpriteRenderer from the parent GameObject (the player)
+    SpriteRenderer playerRenderer = transform.parent.GetComponent<SpriteRenderer>();
+    if (playerRenderer == null)
     {
-        canAttack = false;
-        Collider2D attackCollider = colliderGameObject.GetComponent<PolygonCollider2D>();
-
-        // Get the SpriteRenderer from the parent GameObject (the player)
-        SpriteRenderer playerRenderer = transform.parent.GetComponent<SpriteRenderer>();
-        if (playerRenderer == null)
-        {
-            Debug.LogError("SpriteRenderer not found on the parent GameObject.");
-            yield break;
-        }
-
-        // Enable the collider for the attack
-        attackCollider.enabled = true;
-        yield return new WaitForSeconds(0.1f);
-        attackCollider.enabled = false;
-
-        // Pulse the player's sprite to indicate cooldown
-        float elapsedTime = 0f;
-        Color originalColor = playerRenderer.color;
-        while (elapsedTime < attackCooldown - 0.1f)
-        {
-            elapsedTime += Time.deltaTime;
-            float alpha = Mathf.PingPong(elapsedTime * 2f, 1f); // Create a pulsing effect
-            playerRenderer.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
-            yield return null;
-        }
-
-        // Reset to the original color
-        playerRenderer.color = originalColor;
-
-        canAttack = true;
+        Debug.LogError("SpriteRenderer not found on the parent GameObject.");
+        yield break;
     }
+
+    // Enable the collider for the attack
+    attackCollider.enabled = true;
+    yield return new WaitForSeconds(0.1f);
+    attackCollider.enabled = false;
+
+    // Pulse the player's sprite to indicate cooldown
+    yield return ColorChangeUtility.PulseAlpha(this, playerRenderer, attackCooldown - 0.1f, 2f);
+
+    canAttack = true;
+}
+
 
 }

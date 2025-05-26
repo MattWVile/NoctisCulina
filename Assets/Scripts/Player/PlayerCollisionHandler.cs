@@ -16,19 +16,8 @@ public class PlayerCollisionHandler : MonoBehaviour
             Zombie zombie = collision.GetComponent<Zombie>();
             if (zombie != null)
             {
-                // Reduce player health
-                healthController.playerCurrentHealth -= zombie.Damage;
-
-                if (healthController.playerCurrentHealth <= 0)
-                {
-                    healthController.playerCurrentHealth = 0;
-                    healthController.RemoveHeart();
-                    // Handle game over logic here
-                }
-                else
-                {
-                    healthController.RemoveHeart();
-                }
+                // Use TakeDamage() to reduce player health and trigger related logic
+                healthController.TakeDamage(zombie.Damage);
 
                 // Destroy the enemy or handle its behavior
                 zombie.Die();
