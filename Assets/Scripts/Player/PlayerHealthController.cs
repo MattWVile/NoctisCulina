@@ -103,7 +103,7 @@ public class PlayerHealthController : MonoBehaviour
                     this,
                     lightCircleRenderer,
                     colourToFlash,
-                    .2f,
+                    .15f,
                     lightCircleRenderer.color // Reset to the original color
                 );
 
