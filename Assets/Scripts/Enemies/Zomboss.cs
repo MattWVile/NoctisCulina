@@ -25,6 +25,6 @@ public class Zomboss : Enemy
         float yellowFactor = (spriteRenderer.color.r + spriteRenderer.color.g) / 2f;
 
         // Interpolate speed: 1.0 (original color) -> 0.5 (fully yellow)
-        CurrentSpeed = Mathf.Lerp(MaxSpeed * 0.5f, MaxSpeed, 1f - yellowFactor);
+        CurrentSpeed = Mathf.Lerp(MaxSpeed * 0.25f, MaxSpeed, 1f - yellowFactor);
     }
 }
