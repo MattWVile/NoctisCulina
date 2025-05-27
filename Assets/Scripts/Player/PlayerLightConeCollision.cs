@@ -147,11 +147,14 @@ public class PlayerLightConeCollision : MonoBehaviour
     private void HandleZombossEnterOrStay(Zomboss zomboss)
     {
         SpriteRenderer spriteRenderer = zomboss.GetComponent<SpriteRenderer>();
-        if (spriteRenderer != null && !spriteRenderer.enabled && !zomboss.IsColorFullyChanged)
+
+        // Ensure the sprite renderer is enabled if it exists and is currently disabled
+        if (spriteRenderer != null && !spriteRenderer.enabled)
         {
             zomboss.ToggleSpriteRenderer();
         }
 
+        // Start the color change coroutine if not already running
         if (spriteRenderer != null && !zombossColorChangeCoroutines.ContainsKey(zomboss))
         {
             if (!zombossElapsedTimes.ContainsKey(zomboss))
@@ -173,6 +176,7 @@ public class PlayerLightConeCollision : MonoBehaviour
             zombossColorChangeCoroutines[zomboss] = coroutine;
         }
     }
+
 
     private void HandleZombossExit(Zomboss zomboss)
     {

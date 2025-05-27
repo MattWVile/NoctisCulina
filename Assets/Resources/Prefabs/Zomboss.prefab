@@ -59,7 +59,7 @@ GameObject:
   - component: {fileID: 7068965765502189061}
   m_Layer: 0
   m_Name: Zomboss
-  m_TagString: Zombie
+  m_TagString: Zomboss
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
