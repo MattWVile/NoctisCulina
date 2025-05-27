@@ -14,110 +14,121 @@ public class PlayerLightConeCollision : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        TriggerEnterAndStayLogic(collision);
+        HandleZombieLogic(collision);
     }
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        TriggerEnterAndStayLogic(collision);
+        HandleZombieLogic(collision);
     }
-
-    private void TriggerEnterAndStayLogic(Collider2D collision)
-    {
-        if (collision.CompareTag("Enemy"))
-        {
-            Zombie zombie = collision.GetComponent<Zombie>();
-            if (zombie != null)
-            {
-                SetEnemySpeedToZero(zombie);
-                SpriteRenderer spriteRenderer = zombie.GetComponent<SpriteRenderer>();
-                if (spriteRenderer != null && !spriteRenderer.enabled)
-                {
-                    zombie.ToggleSpriteRenderer();
-                }
-
-                if (spriteRenderer != null && !colorChangeCoroutines.ContainsKey(zombie))
-                {
-                    // Reset elapsed time if the enemy is not already transitioning
-                    if (!elapsedTimes.ContainsKey(zombie))
-                    {
-                        elapsedTimes[zombie] = 0f;
-                    }
-
-                    // Start the color change coroutine
-                    Coroutine coroutine = ColorChangeUtility.ChangeColorOverTime(
-                        this,
-                        spriteRenderer,
-                        spriteRenderer.color,
-                        Color.yellow,
-                        colorChangeDuration - elapsedTimes[zombie],
-                        () =>
-                        {
-                            zombie.MarkColorAsFullyChanged();
-                            if (!zombie.HasScoreBeenAwarded)
-                            {
-                                ScoreController.Instance.AddScore(300);
-                                zombie.HasScoreBeenAwarded = true;
-                            }
-                        }
-                    );
-                    colorChangeCoroutines[zombie] = coroutine;
-                }
-            }
-        }
-    }
-
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.CompareTag("Enemy"))
+        if (collision.CompareTag("Zombie"))
         {
             Zombie zombie = collision.GetComponent<Zombie>();
             if (zombie != null)
             {
-                zombie.CurrentSpeed = zombie.MaxSpeed; // Reset speed when exiting the light cone
-                SpriteRenderer spriteRenderer = zombie.GetComponent<SpriteRenderer>();
-                if (spriteRenderer != null && spriteRenderer.enabled && !zombie.IsColorFullyChanged)
-                {
-                    zombie.ToggleSpriteRenderer(timeToDeactivateSprite);
-                }
-
-                // Check if the coroutine exists before stopping it
-                if (colorChangeCoroutines.ContainsKey(zombie))
-                {
-                    Coroutine coroutine = colorChangeCoroutines[zombie];
-                    if (coroutine != null)
-                    {
-                        StopCoroutine(coroutine);
-                    }
-                    colorChangeCoroutines.Remove(zombie);
-                }
-
-                // Store the remaining time if the color is not fully changed
-                if (!zombie.IsColorFullyChanged)
-                {
-                    if (elapsedTimes.ContainsKey(zombie))
-                    {
-                        elapsedTimes[zombie] = Mathf.Clamp01(elapsedTimes[zombie]); // Store the remaining time
-                    }
-                    else
-                    {
-                        elapsedTimes[zombie] = 0f;
-                    }
-                }
+                HandleZombieExit(zombie);
             }
         }
     }
 
-    private void SetEnemySpeedToZero(Enemy enemy)
+    private void HandleZombieLogic(Collider2D collision)
     {
-        if (enemy.CurrentSpeed == 0f)
+        if (collision.CompareTag("Zombie"))
+        {
+            Zombie zombie = collision.GetComponent<Zombie>();
+            if (zombie != null)
+            {
+                HandleZombieEnterOrStay(zombie);
+            }
+        }
+    }
+
+    private void HandleZombieEnterOrStay(Zombie zombie)
+    {
+        SetEnemySpeedToZero(zombie);
+
+        SpriteRenderer spriteRenderer = zombie.GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null && !spriteRenderer.enabled)
+        {
+            zombie.ToggleSpriteRenderer();
+        }
+
+        if (spriteRenderer != null && !colorChangeCoroutines.ContainsKey(zombie))
+        {
+            // Reset elapsed time if the enemy is not already transitioning
+            if (!elapsedTimes.ContainsKey(zombie))
+            {
+                elapsedTimes[zombie] = 0f;
+            }
+
+            // Start the color change coroutine
+            Coroutine coroutine = ColorChangeUtility.ChangeColorOverTime(
+                this,
+                spriteRenderer,
+                spriteRenderer.color,
+                Color.yellow,
+                colorChangeDuration - elapsedTimes[zombie],
+                () =>
+                {
+                    zombie.MarkColorAsFullyChanged();
+                    if (!zombie.HasScoreBeenAwarded)
+                    {
+                        ScoreController.Instance.AddScore(300);
+                        zombie.HasScoreBeenAwarded = true;
+                    }
+                }
+            );
+            colorChangeCoroutines[zombie] = coroutine;
+        }
+    }
+
+    private void HandleZombieExit(Zombie zombie)
+    {
+        zombie.CurrentSpeed = zombie.MaxSpeed; // Reset speed when exiting the light cone
+
+        SpriteRenderer spriteRenderer = zombie.GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null && spriteRenderer.enabled && !zombie.IsColorFullyChanged)
+        {
+            zombie.ToggleSpriteRenderer(timeToDeactivateSprite);
+        }
+
+        // Check if the coroutine exists before stopping it
+        if (colorChangeCoroutines.ContainsKey(zombie))
+        {
+            Coroutine coroutine = colorChangeCoroutines[zombie];
+            if (coroutine != null)
+            {
+                StopCoroutine(coroutine);
+            }
+            colorChangeCoroutines.Remove(zombie);
+        }
+
+        // Store the remaining time if the color is not fully changed
+        if (!zombie.IsColorFullyChanged)
+        {
+            if (elapsedTimes.ContainsKey(zombie))
+            {
+                elapsedTimes[zombie] = Mathf.Clamp01(elapsedTimes[zombie]); // Store the remaining time
+            }
+            else
+            {
+                elapsedTimes[zombie] = 0f;
+            }
+        }
+    }
+
+    private void SetEnemySpeedToZero(Zombie zombie)
+    {
+        if (zombie.CurrentSpeed == 0f)
         {
             return; // Speed is already zero, no need to set it again
         }
-        if (enemy != null)
+        if (zombie != null)
         {
-            enemy.CurrentSpeed = 0f; // Set speed to zero
+            zombie.CurrentSpeed = 0f; // Set speed to zero
         }
     }
 }

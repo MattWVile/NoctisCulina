@@ -10,6 +10,8 @@ TagManager:
   - Heart
   - MeleeAttack
   - PlayerLightCircle
+  - Zombie
+  - Zomboss
   layers:
   - Default
   - TransparentFX
