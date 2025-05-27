@@ -18,7 +18,7 @@ public class PlayerLightCircleCollision : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.CompareTag("Enemy"))
+        if (collision.CompareTag("Zombie"))
         {
             enemiesInCircle.Remove(collision.gameObject);
         }
@@ -26,7 +26,7 @@ public class PlayerLightCircleCollision : MonoBehaviour
 
     private void TriggerEnterAndStayLogic(Collider2D collision)
     {
-        if (collision.CompareTag("Enemy"))
+        if (collision.CompareTag("Zombie"))
         {
             Zombie zombie = collision.GetComponent<Zombie>();
             if (zombie != null && !zombie.IsColorFullyChanged)

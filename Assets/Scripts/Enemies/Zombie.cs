@@ -10,6 +10,4 @@ public class Zombie : Enemy
         CurrentSpeed = MaxSpeed;
         GetComponent<SpriteRenderer>().enabled = false;
     }
-
-    // Additional behavior specific to Zombie
 }

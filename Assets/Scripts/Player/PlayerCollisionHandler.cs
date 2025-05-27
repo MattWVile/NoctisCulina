@@ -11,7 +11,7 @@ public class PlayerCollisionHandler : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Enemy"))
+        if (collision.CompareTag("Zombie"))
         {
             Zombie zombie = collision.GetComponent<Zombie>();
             if (zombie != null)
