@@ -520,11 +520,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6984041432663159274, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -5.0642915
+      value: -0.07
       objectReference: {fileID: 0}
     - target: {fileID: 6984041432663159274, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.76761866
+      value: -6.2
       objectReference: {fileID: 0}
     - target: {fileID: 6984041432663159274, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
       propertyPath: m_LocalPosition.z
@@ -565,6 +565,10 @@ PrefabInstance:
     - target: {fileID: 8180261063808567810, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8180261063808567810, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
+      propertyPath: m_TagString
+      value: Zomboss
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 4300620221895516712, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}

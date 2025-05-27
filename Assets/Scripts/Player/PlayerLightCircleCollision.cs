@@ -18,7 +18,7 @@ public class PlayerLightCircleCollision : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.CompareTag("Zombie"))
+        if (collision.CompareTag("Zombie") || collision.CompareTag("Zomboss"))
         {
             enemiesInCircle.Remove(collision.gameObject);
         }
@@ -26,20 +26,21 @@ public class PlayerLightCircleCollision : MonoBehaviour
 
     private void TriggerEnterAndStayLogic(Collider2D collision)
     {
-        if (collision.CompareTag("Zombie"))
+        if (collision.CompareTag("Zombie") || collision.CompareTag("Zomboss"))
         {
-            Zombie zombie = collision.GetComponent<Zombie>();
-            if (zombie != null && !zombie.IsColorFullyChanged)
+            Enemy enemy = collision.GetComponent<Enemy>();
+            if (enemy != null && !enemy.IsColorFullyChanged)
             {
-                if (zombie.GetComponent<SpriteRenderer>().enabled == false)
+                SpriteRenderer spriteRenderer = enemy.GetComponent<SpriteRenderer>();
+                if (spriteRenderer != null && !spriteRenderer.enabled)
                 {
-                    zombie.ToggleSpriteRenderer();
+                    enemy.ToggleSpriteRenderer();
                 }
             }
         }
     }
 
-    // New method to destroy all nearby enemies
+    // Method to destroy all nearby enemies
     public void DestroyAllNearbyEnemies()
     {
         List<GameObject> enemiesToDestroy = new List<GameObject>(enemiesInCircle);
@@ -48,7 +49,11 @@ public class PlayerLightCircleCollision : MonoBehaviour
         {
             if (enemy != null)
             {
-                Destroy(enemy);
+                Enemy enemyComponent = enemy.GetComponent<Enemy>();
+                if (enemyComponent != null)
+                {
+                    enemyComponent.Die(); // Use the Enemy class's Die method to handle destruction and scoring
+                }
                 enemiesInCircle.Remove(enemy);
             }
         }

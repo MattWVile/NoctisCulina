@@ -13,15 +13,20 @@ public class PlayerCollisionHandler : MonoBehaviour
     {
         if (collision.CompareTag("Zombie"))
         {
-            Zombie zombie = collision.GetComponent<Zombie>();
-            if (zombie != null)
-            {
-                // Use TakeDamage() to reduce player health and trigger related logic
-                healthController.TakeDamage(zombie.Damage);
+            HandleEnemyCollision(collision.GetComponent<Zombie>());
+        }
+        else if (collision.CompareTag("Zomboss"))
+        {
+            HandleEnemyCollision(collision.GetComponent<Zomboss>());
+        }
+    }
 
-                // Destroy the enemy or handle its behavior
-                zombie.Die();
-            }
+    private void HandleEnemyCollision(Enemy enemy)
+    {
+        if (enemy != null)
+        {
+            healthController.TakeDamage(enemy.Damage);
+            Destroy(enemy.gameObject);
         }
     }
 }

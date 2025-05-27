@@ -6,12 +6,14 @@ public class Zomboss : Enemy
 
     private void Awake()
     {
-        TotalHealth = 225f;
+        TotalHealth = 330f;
         Damage = 2f;
         MaxSpeed = .4f;
         CurrentSpeed = MaxSpeed;
         spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.enabled = false;
+        ScoreWhenColurChanged = 1000;
+        ScoreWhenKilled = 5000;
     }
 
     // Update speed based on the current color

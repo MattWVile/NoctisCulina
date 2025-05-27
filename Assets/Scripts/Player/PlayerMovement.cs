@@ -24,10 +24,10 @@ public class PlayerMovement : MonoBehaviour
         RotateLightTowardsMouse();
 
         // Only allow movement if spawning is disabled
-        if (!enemySpawner.spawningEnabled)
-        {
-            MovePlayer();
-        }
+        //if (!enemySpawner.spawningEnabled)
+        //{
+        //    MovePlayer();
+        //}
     }
 
     void RotateLightTowardsMouse()

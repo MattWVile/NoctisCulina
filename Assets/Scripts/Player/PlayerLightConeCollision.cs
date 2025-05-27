@@ -5,21 +5,25 @@ using System.Collections.Generic;
 public class PlayerLightConeCollision : MonoBehaviour
 {
     [SerializeField]
-    private float timeToDeactivateSprite = .7f; // Default to 1 second
+    private float timeToDeactivateSprite = 0.7f; // Time to disable sprite after exiting light cone
 
-    private float colorChangeDuration = 1.5f; // Default to 1 second
+    private float zombieColorChangeDuration = 1.5f; // Time for zombies to fully change color
+    private float zombossColorChangeDuration = 10f; // Time for Zomboss to fully change color (much slower)
 
-    private Dictionary<Zombie, Coroutine> colorChangeCoroutines = new Dictionary<Zombie, Coroutine>();
-    private Dictionary<Zombie, float> elapsedTimes = new Dictionary<Zombie, float>();
+    private Dictionary<Zombie, Coroutine> zombieColorChangeCoroutines = new Dictionary<Zombie, Coroutine>();
+    private Dictionary<Zombie, float> zombieElapsedTimes = new Dictionary<Zombie, float>();
+
+    private Dictionary<Zomboss, Coroutine> zombossColorChangeCoroutines = new Dictionary<Zomboss, Coroutine>();
+    private Dictionary<Zomboss, float> zombossElapsedTimes = new Dictionary<Zomboss, float>();
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        HandleZombieLogic(collision);
+        HandleEnemyLogic(collision);
     }
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        HandleZombieLogic(collision);
+        HandleEnemyLogic(collision);
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -32,9 +36,17 @@ public class PlayerLightConeCollision : MonoBehaviour
                 HandleZombieExit(zombie);
             }
         }
+        else if (collision.CompareTag("Zomboss"))
+        {
+            Zomboss zomboss = collision.GetComponent<Zomboss>();
+            if (zomboss != null)
+            {
+                HandleZombossExit(zomboss);
+            }
+        }
     }
 
-    private void HandleZombieLogic(Collider2D collision)
+    private void HandleEnemyLogic(Collider2D collision)
     {
         if (collision.CompareTag("Zombie"))
         {
@@ -44,24 +56,37 @@ public class PlayerLightConeCollision : MonoBehaviour
                 HandleZombieEnterOrStay(zombie);
             }
         }
+        else if (collision.CompareTag("Zomboss"))
+        {
+            Zomboss zomboss = collision.GetComponent<Zomboss>();
+            if (zomboss != null)
+            {
+                HandleZombossEnterOrStay(zomboss);
+            }
+        }
     }
 
     private void HandleZombieEnterOrStay(Zombie zombie)
     {
-        SetEnemySpeedToZero(zombie);
+        // Freeze the zombie
+        zombie.SetSpeedToZero();
 
+        // Get the SpriteRenderer component
         SpriteRenderer spriteRenderer = zombie.GetComponent<SpriteRenderer>();
+
+        // Only toggle the sprite renderer if it exists and is not already enabled
         if (spriteRenderer != null && !spriteRenderer.enabled)
         {
             zombie.ToggleSpriteRenderer();
         }
 
-        if (spriteRenderer != null && !colorChangeCoroutines.ContainsKey(zombie))
+        // Start the color change coroutine if not already running
+        if (spriteRenderer != null && !zombieColorChangeCoroutines.ContainsKey(zombie))
         {
             // Reset elapsed time if the enemy is not already transitioning
-            if (!elapsedTimes.ContainsKey(zombie))
+            if (!zombieElapsedTimes.ContainsKey(zombie))
             {
-                elapsedTimes[zombie] = 0f;
+                zombieElapsedTimes[zombie] = 0f;
             }
 
             // Start the color change coroutine
@@ -70,65 +95,117 @@ public class PlayerLightConeCollision : MonoBehaviour
                 spriteRenderer,
                 spriteRenderer.color,
                 Color.yellow,
-                colorChangeDuration - elapsedTimes[zombie],
+                zombieColorChangeDuration - zombieElapsedTimes[zombie],
                 () =>
                 {
                     zombie.MarkColorAsFullyChanged();
-                    if (!zombie.HasScoreBeenAwarded)
-                    {
-                        ScoreController.Instance.AddScore(300);
-                        zombie.HasScoreBeenAwarded = true;
-                    }
                 }
             );
-            colorChangeCoroutines[zombie] = coroutine;
+            zombieColorChangeCoroutines[zombie] = coroutine;
         }
     }
 
     private void HandleZombieExit(Zombie zombie)
     {
-        zombie.CurrentSpeed = zombie.MaxSpeed; // Reset speed when exiting the light cone
+        // Restore the zombie's speed
+        zombie.CurrentSpeed = zombie.MaxSpeed;
 
+        // Get the SpriteRenderer component
         SpriteRenderer spriteRenderer = zombie.GetComponent<SpriteRenderer>();
+
+        // Only toggle the sprite renderer if it exists, is enabled, and the color is not fully changed
         if (spriteRenderer != null && spriteRenderer.enabled && !zombie.IsColorFullyChanged)
         {
             zombie.ToggleSpriteRenderer(timeToDeactivateSprite);
         }
 
         // Check if the coroutine exists before stopping it
-        if (colorChangeCoroutines.ContainsKey(zombie))
+        if (zombieColorChangeCoroutines.ContainsKey(zombie))
         {
-            Coroutine coroutine = colorChangeCoroutines[zombie];
+            Coroutine coroutine = zombieColorChangeCoroutines[zombie];
             if (coroutine != null)
             {
                 StopCoroutine(coroutine);
             }
-            colorChangeCoroutines.Remove(zombie);
+            zombieColorChangeCoroutines.Remove(zombie);
         }
 
         // Store the remaining time if the color is not fully changed
         if (!zombie.IsColorFullyChanged)
         {
-            if (elapsedTimes.ContainsKey(zombie))
+            if (zombieElapsedTimes.ContainsKey(zombie))
             {
-                elapsedTimes[zombie] = Mathf.Clamp01(elapsedTimes[zombie]); // Store the remaining time
+                zombieElapsedTimes[zombie] = Mathf.Clamp01(zombieElapsedTimes[zombie]); // Store the remaining time
             }
             else
             {
-                elapsedTimes[zombie] = 0f;
+                zombieElapsedTimes[zombie] = 0f;
             }
         }
     }
 
-    private void SetEnemySpeedToZero(Zombie zombie)
+    private void HandleZombossEnterOrStay(Zomboss zomboss)
     {
-        if (zombie.CurrentSpeed == 0f)
+        SpriteRenderer spriteRenderer = zomboss.GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null && !spriteRenderer.enabled && !zomboss.IsColorFullyChanged)
         {
-            return; // Speed is already zero, no need to set it again
+            zomboss.ToggleSpriteRenderer();
         }
-        if (zombie != null)
+
+        if (spriteRenderer != null && !zombossColorChangeCoroutines.ContainsKey(zomboss))
         {
-            zombie.CurrentSpeed = 0f; // Set speed to zero
+            if (!zombossElapsedTimes.ContainsKey(zomboss))
+            {
+                zombossElapsedTimes[zomboss] = 0f;
+            }
+
+            Coroutine coroutine = ColorChangeUtility.ChangeColorOverTime(
+                this,
+                spriteRenderer,
+                spriteRenderer.color,
+                Color.yellow,
+                zombossColorChangeDuration - zombossElapsedTimes[zomboss],
+                () =>
+                {
+                    zomboss.MarkColorAsFullyChanged(); // Score is now handled in Enemy.cs
+                }
+            );
+            zombossColorChangeCoroutines[zomboss] = coroutine;
         }
     }
+
+    private void HandleZombossExit(Zomboss zomboss)
+    {
+        SpriteRenderer spriteRenderer = zomboss.GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null && spriteRenderer.enabled && !zomboss.IsColorFullyChanged)
+        {
+            zomboss.ToggleSpriteRenderer(timeToDeactivateSprite);
+        }
+
+        if (zombossColorChangeCoroutines.ContainsKey(zomboss))
+        {
+            Coroutine coroutine = zombossColorChangeCoroutines[zomboss];
+            if (coroutine != null)
+            {
+                StopCoroutine(coroutine);
+            }
+            zombossColorChangeCoroutines.Remove(zomboss);
+        }
+
+        if (!zomboss.IsColorFullyChanged)
+        {
+            if (zombossElapsedTimes.ContainsKey(zomboss))
+            {
+                zombossElapsedTimes[zomboss] = Mathf.Clamp01(zombossElapsedTimes[zomboss]);
+            }
+            else
+            {
+                zombossElapsedTimes[zomboss] = 0f;
+            }
+        }
+
+        // Update Zomboss speed based on its current color
+        zomboss.UpdateSpeedBasedOnColor();
+    }
 }
+
