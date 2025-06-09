@@ -40,6 +40,10 @@ public abstract class Enemy : MonoBehaviour
     // Use this to update sprite visibility based on light/circle and color state
     public void UpdateSpriteRendererState()
     {
+        // Prevent running if this object is destroyed
+        if (this == null || gameObject == null)
+            return;
+
         SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer == null) return;
 

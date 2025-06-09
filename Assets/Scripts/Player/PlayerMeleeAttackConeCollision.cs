@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlayerMeleeAttackConeCollision : MonoBehaviour
 {
-    public int damageAmount = 11; // Amount of damage to deal
+    public int damageAmount = 33; // Amount of damage to deal
 
     private void OnTriggerEnter2D(Collider2D collision)
     {

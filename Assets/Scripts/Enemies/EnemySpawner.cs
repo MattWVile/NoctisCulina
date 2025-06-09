@@ -18,6 +18,8 @@ public class EnemySpawner : MonoBehaviour
     // Zomboss spawn tracking
     private int zombossesSpawnedThisRound = 0;
     private int zombossesDiedThisRound = 0;
+    private bool waitingForFirstZomboss = false;
+    private float firstZombossTimer = 0f;
     private bool waitingForSecondZomboss = false;
     private float secondZombossTimer = 0f;
 
@@ -38,7 +40,10 @@ public class EnemySpawner : MonoBehaviour
         zombossesSpawnedThisRound = 0;
         zombossesDiedThisRound = 0;
         waitingForSecondZomboss = false;
-        SpawnZomboss(); // Spawn first Zomboss at round start
+
+        // Set random timer for first Zomboss spawn
+        firstZombossTimer = Random.Range(5f, 10f);
+        waitingForFirstZomboss = true;
     }
 
     void Update()
@@ -62,11 +67,12 @@ public class EnemySpawner : MonoBehaviour
             Debug.Log("Spawning automatically toggled: " + (spawningEnabled ? "Enabled" : "Disabled"));
             toggleTimerCountdown = toggleTimer;
 
-            // New round: reset Zomboss counters and spawn first Zomboss
+            // New round: reset Zomboss counters and set up first Zomboss spawn
             zombossesSpawnedThisRound = 0;
             zombossesDiedThisRound = 0;
             waitingForSecondZomboss = false;
-            SpawnZomboss();
+            firstZombossTimer = Random.Range(5f, 10f);
+            waitingForFirstZomboss = true;
         }
 
         // Only spawn enemies if spawning is enabled
@@ -77,6 +83,17 @@ public class EnemySpawner : MonoBehaviour
             {
                 SpawnZombie();
                 spawnTimer = spawnInterval;
+            }
+        }
+
+        // Handle delayed first Zomboss spawn at round start
+        if (waitingForFirstZomboss)
+        {
+            firstZombossTimer -= Time.deltaTime;
+            if (firstZombossTimer <= 0)
+            {
+                SpawnZomboss();
+                waitingForFirstZomboss = false;
             }
         }
 
@@ -116,7 +133,7 @@ public class EnemySpawner : MonoBehaviour
         {
             // First Zomboss died, start timer for second
             waitingForSecondZomboss = true;
-            secondZombossTimer = 5f;
+            secondZombossTimer = Random.Range(15f, 30f);
         }
     }
 
@@ -161,3 +178,4 @@ public class EnemySpawner : MonoBehaviour
         return spawnPosition;
     }
 }
+

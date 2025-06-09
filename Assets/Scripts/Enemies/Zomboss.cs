@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Zomboss : Enemy
@@ -13,7 +14,7 @@ public class Zomboss : Enemy
 
     private void Awake()
     {
-        TotalHealth = 330f;
+        TotalHealth = 280f;
         Damage = 2f;
         MaxSpeed = .4f;
         CurrentSpeed = MaxSpeed;
@@ -21,8 +22,6 @@ public class Zomboss : Enemy
         spriteRenderer.enabled = false;
         ScoreWhenColurChanged = 1000;
         ScoreWhenKilled = 5000;
-        if (spriteRenderer != null)
-            originalColor = spriteRenderer.color;
     }
 
     private void Update()
@@ -45,12 +44,14 @@ public class Zomboss : Enemy
                 {
                     spriteRenderer.enabled = true;
                 }
-                spriteRenderer.color = flashColor;
             }
             else
             {
-                spriteRenderer.color = originalColor;
                 isFlashing = false;
+                if (spriteRenderer.enabled)
+                {
+                    spriteRenderer.enabled = true;
+                }
             }
         }
     }
@@ -84,7 +85,7 @@ public class Zomboss : Enemy
         CurrentSpeed = Mathf.Lerp(MaxSpeed * 0.25f, MaxSpeed, 1f - yellowFactor);
     }
 
-    public void Die()
+    public override void Die()
     {
         // Publish the ZombossDiedEvent
         EventBus.Publish(new ZombossDiedEvent { Sender = this });
