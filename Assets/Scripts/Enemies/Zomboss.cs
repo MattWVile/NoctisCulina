@@ -72,6 +72,126 @@ public class Zomboss : Enemy
         flashTimer = 1f; // Flash for 1 second
     }
 
+        if (isFlashing && spriteRenderer != null)
+        {
+            flashTimer -= Time.deltaTime;
+            if (flashTimer > 0f)
+            {
+                if (!spriteRenderer.enabled)
+                {
+                    spriteRenderer.enabled = true;
+                }
+                spriteRenderer.color = flashColor;
+            }
+            else
+            {
+                if (spriteRenderer.enabled)
+                {
+                    spriteRenderer.enabled = false;
+                }
+                spriteRenderer.color = originalColor;
+                isFlashing = false;
+            }
+        }
+    }
+
+    private bool IsWithinCameraBounds()
+    {
+        Camera cam = Camera.main;
+        if (cam == null) return false;
+
+        Vector3 viewportPos = cam.WorldToViewportPoint(transform.position);
+        return viewportPos.x >= 0f && viewportPos.x <= 1f &&
+               viewportPos.y >= 0f && viewportPos.y <= 1f &&
+               viewportPos.z > 0f;
+    }
+
+    private void StartFlash()
+    {
+        isFlashing = true;
+        flashTimer = 1f; // Flash for 1 second
+    }
+
+        if (isFlashing && spriteRenderer != null)
+        {
+            flashTimer -= Time.deltaTime;
+            if (flashTimer > 0f)
+            {
+                if (!spriteRenderer.enabled)
+                {
+                    spriteRenderer.enabled = true;
+                }
+                spriteRenderer.color = flashColor;
+            }
+            else
+            {
+                if (spriteRenderer.enabled)
+                {
+                    spriteRenderer.enabled = false;
+                }
+                spriteRenderer.color = originalColor;
+                isFlashing = false;
+            }
+        }
+    }
+
+    private bool IsWithinCameraBounds()
+    {
+        Camera cam = Camera.main;
+        if (cam == null) return false;
+
+        Vector3 viewportPos = cam.WorldToViewportPoint(transform.position);
+        return viewportPos.x >= 0f && viewportPos.x <= 1f &&
+               viewportPos.y >= 0f && viewportPos.y <= 1f &&
+               viewportPos.z > 0f;
+    }
+
+    private void StartFlash()
+    {
+        isFlashing = true;
+        flashTimer = 1f; // Flash for 1 second
+    }
+
+        if (isFlashing && spriteRenderer != null)
+        {
+            flashTimer -= Time.deltaTime;
+            if (flashTimer > 0f)
+            {
+                if (!spriteRenderer.enabled)
+                {
+                    spriteRenderer.enabled = true;
+                }
+                spriteRenderer.color = flashColor;
+            }
+            else
+            {
+                if (spriteRenderer.enabled)
+                {
+                    spriteRenderer.enabled = false;
+                }
+                spriteRenderer.color = originalColor;
+                isFlashing = false;
+            }
+        }
+    }
+
+    private bool IsWithinCameraBounds()
+    {
+        Camera cam = Camera.main;
+        if (cam == null) return false;
+
+        Vector3 viewportPos = cam.WorldToViewportPoint(transform.position);
+        return viewportPos.x >= 0f && viewportPos.x <= 1f &&
+               viewportPos.y >= 0f && viewportPos.y <= 1f &&
+               viewportPos.z > 0f;
+    }
+
+    private void StartFlash()
+    {
+        isFlashing = true;
+        flashTimer = 1f; // Flash for 1 second
+    }
+
     // Update speed based on the current color
     public void UpdateSpeedBasedOnColor()
     {

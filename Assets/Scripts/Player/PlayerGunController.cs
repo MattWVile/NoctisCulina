@@ -2,9 +2,12 @@ using UnityEngine;
 
 public class PlayerGunController : MonoBehaviour
 {
+
     public Gun currentGun;
     void Update()
     {
+        if (GameManager.Instance != null && GameManager.Instance.IsGamePaused)
+            return;
         if (Input.GetButtonDown("Fire1"))
         {
             currentGun.Shoot();

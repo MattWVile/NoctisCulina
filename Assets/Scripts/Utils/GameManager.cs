@@ -28,7 +28,7 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (IsGamePaused && (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)))
+        if (IsGamePaused && Input.GetKeyDown(KeyCode.Space))
         {
             ResumeGame();
         }

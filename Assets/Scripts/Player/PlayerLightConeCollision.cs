@@ -16,6 +16,12 @@ public class PlayerLightConeCollision : MonoBehaviour
     private Dictionary<Zomboss, Coroutine> zombossColorChangeCoroutines = new Dictionary<Zomboss, Coroutine>();
     private Dictionary<Zomboss, float> zombossElapsedTimes = new Dictionary<Zomboss, float>();
 
+    // New: Track exit coroutines for delayed sprite disabling
+    private Dictionary<Zombie, Coroutine> zombieExitCoroutines = new Dictionary<Zombie, Coroutine>();
+    private Dictionary<Zomboss, Coroutine> zombossExitCoroutines = new Dictionary<Zomboss, Coroutine>();
+
+    private float spriteDisableDelay = 0.4f; // Delay before disabling sprite
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         HandleEnemyLogic(collision);
@@ -36,6 +42,15 @@ public class PlayerLightConeCollision : MonoBehaviour
                 zombie.IsInLightCone = false;
                 zombie.UpdateSpriteRendererState();
                 HandleZombieExit(zombie);
+
+                // Start delayed sprite disable
+                if (zombieExitCoroutines.ContainsKey(zombie))
+                {
+                    StopCoroutine(zombieExitCoroutines[zombie]);
+                    zombieExitCoroutines.Remove(zombie);
+                }
+                Coroutine coroutine = StartCoroutine(DelayedSpriteDisable(zombie));
+                zombieExitCoroutines[zombie] = coroutine;
             }
         }
         else if (collision.CompareTag("Zomboss"))
@@ -195,5 +210,12 @@ public class PlayerLightConeCollision : MonoBehaviour
 
         // Update Zomboss speed based on its current color
         zomboss.UpdateSpeedBasedOnColor();
+    }
+
+    // Coroutine to delay sprite renderer disabling
+    private IEnumerator DelayedSpriteDisable(Enemy enemy)
+    {
+        yield return new WaitForSeconds(spriteDisableDelay);
+        enemy.UpdateSpriteRendererState();
     }
 }
