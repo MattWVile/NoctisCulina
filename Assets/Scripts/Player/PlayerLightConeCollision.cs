@@ -33,6 +33,8 @@ public class PlayerLightConeCollision : MonoBehaviour
             Zombie zombie = collision.GetComponent<Zombie>();
             if (zombie != null)
             {
+                zombie.IsInLightCone = false;
+                zombie.UpdateSpriteRendererState();
                 HandleZombieExit(zombie);
             }
         }
@@ -41,6 +43,8 @@ public class PlayerLightConeCollision : MonoBehaviour
             Zomboss zomboss = collision.GetComponent<Zomboss>();
             if (zomboss != null)
             {
+                zomboss.IsInLightCone = false;
+                zomboss.UpdateSpriteRendererState();
                 HandleZombossExit(zomboss);
             }
         }
@@ -53,6 +57,8 @@ public class PlayerLightConeCollision : MonoBehaviour
             Zombie zombie = collision.GetComponent<Zombie>();
             if (zombie != null)
             {
+                zombie.IsInLightCone = true;
+                zombie.UpdateSpriteRendererState();
                 HandleZombieEnterOrStay(zombie);
             }
         }
@@ -61,6 +67,8 @@ public class PlayerLightConeCollision : MonoBehaviour
             Zomboss zomboss = collision.GetComponent<Zomboss>();
             if (zomboss != null)
             {
+                zomboss.IsInLightCone = true;
+                zomboss.UpdateSpriteRendererState();
                 HandleZombossEnterOrStay(zomboss);
             }
         }
@@ -73,12 +81,6 @@ public class PlayerLightConeCollision : MonoBehaviour
 
         // Get the SpriteRenderer component
         SpriteRenderer spriteRenderer = zombie.GetComponent<SpriteRenderer>();
-
-        // Only toggle the sprite renderer if it exists and is not already enabled
-        if (spriteRenderer != null && !spriteRenderer.enabled)
-        {
-            zombie.ToggleSpriteRenderer();
-        }
 
         // Start the color change coroutine if not already running
         if (spriteRenderer != null && !zombieColorChangeCoroutines.ContainsKey(zombie))
@@ -113,12 +115,6 @@ public class PlayerLightConeCollision : MonoBehaviour
         // Get the SpriteRenderer component
         SpriteRenderer spriteRenderer = zombie.GetComponent<SpriteRenderer>();
 
-        // Only toggle the sprite renderer if it exists, is enabled, and the color is not fully changed
-        if (spriteRenderer != null && spriteRenderer.enabled && !zombie.IsColorFullyChanged)
-        {
-            zombie.ToggleSpriteRenderer(timeToDeactivateSprite);
-        }
-
         // Check if the coroutine exists before stopping it
         if (zombieColorChangeCoroutines.ContainsKey(zombie))
         {
@@ -135,7 +131,7 @@ public class PlayerLightConeCollision : MonoBehaviour
         {
             if (zombieElapsedTimes.ContainsKey(zombie))
             {
-                zombieElapsedTimes[zombie] = Mathf.Clamp01(zombieElapsedTimes[zombie]); // Store the remaining time
+                zombieElapsedTimes[zombie] = Mathf.Clamp01(zombieElapsedTimes[zombie]);
             }
             else
             {
@@ -147,12 +143,6 @@ public class PlayerLightConeCollision : MonoBehaviour
     private void HandleZombossEnterOrStay(Zomboss zomboss)
     {
         SpriteRenderer spriteRenderer = zomboss.GetComponent<SpriteRenderer>();
-
-        // Ensure the sprite renderer is enabled if it exists and is currently disabled
-        if (spriteRenderer != null && !spriteRenderer.enabled)
-        {
-            zomboss.ToggleSpriteRenderer();
-        }
 
         // Start the color change coroutine if not already running
         if (spriteRenderer != null && !zombossColorChangeCoroutines.ContainsKey(zomboss))
@@ -170,21 +160,16 @@ public class PlayerLightConeCollision : MonoBehaviour
                 zombossColorChangeDuration - zombossElapsedTimes[zomboss],
                 () =>
                 {
-                    zomboss.MarkColorAsFullyChanged(); // Score is now handled in Enemy.cs
+                    zomboss.MarkColorAsFullyChanged();
                 }
             );
             zombossColorChangeCoroutines[zomboss] = coroutine;
         }
     }
 
-
     private void HandleZombossExit(Zomboss zomboss)
     {
         SpriteRenderer spriteRenderer = zomboss.GetComponent<SpriteRenderer>();
-        if (spriteRenderer != null && spriteRenderer.enabled && !zomboss.IsColorFullyChanged)
-        {
-            zomboss.ToggleSpriteRenderer(timeToDeactivateSprite);
-        }
 
         if (zombossColorChangeCoroutines.ContainsKey(zomboss))
         {
@@ -212,4 +197,3 @@ public class PlayerLightConeCollision : MonoBehaviour
         zomboss.UpdateSpeedBasedOnColor();
     }
 }
-

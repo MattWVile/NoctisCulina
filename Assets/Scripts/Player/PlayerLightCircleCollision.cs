@@ -3,58 +3,67 @@ using System.Collections.Generic;
 
 public class PlayerLightCircleCollision : MonoBehaviour
 {
-    public List<GameObject> enemiesInCircle;
+    public List<GameObject> enemiesInCircle = new List<GameObject>();
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        TriggerEnterAndStayLogic(collision);
-        enemiesInCircle.Add(collision.gameObject);
+        if (collision.CompareTag("Zombie") || collision.CompareTag("Zomboss"))
+        {
+            Enemy enemy = collision.GetComponent<Enemy>();
+            if (enemy != null)
+            {
+                enemy.IsInLightCircle = true;
+                enemy.UpdateSpriteRendererState();
+            }
+            if (!enemiesInCircle.Contains(collision.gameObject))
+            {
+                enemiesInCircle.Add(collision.gameObject);
+            }
+        }
     }
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        TriggerEnterAndStayLogic(collision);
+        if (collision.CompareTag("Zombie") || collision.CompareTag("Zomboss"))
+        {
+            Enemy enemy = collision.GetComponent<Enemy>();
+            if (enemy != null)
+            {
+                enemy.IsInLightCircle = true;
+                enemy.UpdateSpriteRendererState();
+            }
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.CompareTag("Zombie") || collision.CompareTag("Zomboss"))
         {
+            Enemy enemy = collision.GetComponent<Enemy>();
+            if (enemy != null)
+            {
+                enemy.IsInLightCircle = false;
+                enemy.UpdateSpriteRendererState();
+            }
             enemiesInCircle.Remove(collision.gameObject);
         }
     }
 
-    private void TriggerEnterAndStayLogic(Collider2D collision)
-    {
-        if (collision.CompareTag("Zombie") || collision.CompareTag("Zomboss"))
-        {
-            Enemy enemy = collision.GetComponent<Enemy>();
-            if (enemy != null && !enemy.IsColorFullyChanged)
-            {
-                SpriteRenderer spriteRenderer = enemy.GetComponent<SpriteRenderer>();
-                if (spriteRenderer != null && !spriteRenderer.enabled)
-                {
-                    enemy.ToggleSpriteRenderer();
-                }
-            }
-        }
-    }
-
-    // Method to destroy all nearby enemies
+    // Method to deal 20 damage to all nearby enemies
     public void DestroyAllNearbyEnemies()
     {
-        List<GameObject> enemiesToDestroy = new List<GameObject>(enemiesInCircle);
+        List<GameObject> enemiesToDamage = new List<GameObject>(enemiesInCircle);
 
-        foreach (GameObject enemy in enemiesToDestroy)
+        foreach (GameObject enemyObj in enemiesToDamage)
         {
-            if (enemy != null)
+            if (enemyObj != null)
             {
-                Enemy enemyComponent = enemy.GetComponent<Enemy>();
+                Enemy enemyComponent = enemyObj.GetComponent<Enemy>();
                 if (enemyComponent != null)
                 {
-                    enemyComponent.Die(); // Use the Enemy class's Die method to handle destruction and scoring
+                    enemyComponent.TakeDamage(20f);
                 }
-                enemiesInCircle.Remove(enemy);
+                enemiesInCircle.Remove(enemyObj);
             }
         }
     }

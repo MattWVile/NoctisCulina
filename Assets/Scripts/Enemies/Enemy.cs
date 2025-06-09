@@ -8,12 +8,14 @@ public abstract class Enemy : MonoBehaviour
     public float Damage { get; protected set; }
     public float MaxSpeed { get; protected set; }
     public float CurrentSpeed { get; set; }
-    public int  ScoreWhenKilled { get; set; }
+    public int ScoreWhenKilled { get; set; }
     public int ScoreWhenColurChanged { get; set; }
 
-    // New boolean to track if the color has fully changed
+    // Tracks if the color has fully changed
     public bool IsColorFullyChanged { get; private set; } = false;
     public bool HasScoreBeenAwarded { get; set; } = false;
+    public bool IsInLightCone { get; set; }
+    public bool IsInLightCircle { get; set; }
 
     protected virtual void Start()
     {
@@ -35,9 +37,26 @@ public abstract class Enemy : MonoBehaviour
         Destroy(gameObject);
     }
 
+    // Use this to update sprite visibility based on light/circle and color state
+    public void UpdateSpriteRendererState()
+    {
+        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer == null) return;
+
+        // Always enable if color is fully changed
+        if (IsColorFullyChanged)
+        {
+            spriteRenderer.enabled = true;
+        }
+        else
+        {
+            spriteRenderer.enabled = IsInLightCone || IsInLightCircle;
+        }
+    }
+
+    // Deprecated: Prefer UpdateSpriteRendererState for coordinated logic
     public virtual void ToggleSpriteRenderer(float timeDelay = 0f)
     {
-        // Only toggle the SpriteRenderer if the color has not fully changed
         if (!IsColorFullyChanged)
         {
             StartCoroutine(ToggleSpriteRendererCoroutine(timeDelay));
@@ -46,10 +65,8 @@ public abstract class Enemy : MonoBehaviour
 
     private IEnumerator ToggleSpriteRendererCoroutine(float timeDelay)
     {
-        // Wait for the specified time delay
         yield return new WaitForSeconds(timeDelay);
 
-        // Toggle the sprite renderer
         SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer != null && !IsColorFullyChanged)
         {
@@ -57,19 +74,14 @@ public abstract class Enemy : MonoBehaviour
         }
     }
 
-    // New method to mark the color as fully changed
+    // Mark the color as fully changed and update sprite state
     public void MarkColorAsFullyChanged()
     {
         IsColorFullyChanged = true;
-
-        // Ensure the SpriteRenderer is enabled when the color is fully changed
-        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
-        if (spriteRenderer != null)
-        {
-            spriteRenderer.enabled = true;
-        }
+        UpdateSpriteRendererState();
         AddScore(ScoreWhenColurChanged);
     }
+
     protected void AddScore(int score)
     {
         if (ScoreController.Instance != null)
