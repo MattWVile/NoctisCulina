@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Zomboss : Enemy
@@ -13,7 +14,7 @@ public class Zomboss : Enemy
 
     private void Awake()
     {
-        TotalHealth = 330f;
+        TotalHealth = 280f;
         Damage = 2f;
         MaxSpeed = .4f;
         CurrentSpeed = MaxSpeed;
@@ -21,8 +22,6 @@ public class Zomboss : Enemy
         spriteRenderer.enabled = false;
         ScoreWhenColurChanged = 1000;
         ScoreWhenKilled = 5000;
-        if (spriteRenderer != null)
-            originalColor = spriteRenderer.color;
     }
 
     private void Update()
@@ -45,172 +44,14 @@ public class Zomboss : Enemy
                 {
                     spriteRenderer.enabled = true;
                 }
-                spriteRenderer.color = flashColor;
             }
             else
             {
-                spriteRenderer.color = originalColor;
                 isFlashing = false;
-            }
-        }
-    }
-
-    private bool IsWithinCameraBounds()
-    {
-        Camera cam = Camera.main;
-        if (cam == null) return false;
-
-        Vector3 viewportPos = cam.WorldToViewportPoint(transform.position);
-        return viewportPos.x >= 0f && viewportPos.x <= 1f &&
-               viewportPos.y >= 0f && viewportPos.y <= 1f &&
-               viewportPos.z > 0f;
-    }
-
-    private void StartFlash()
-    {
-        isFlashing = true;
-        flashTimer = 1f; // Flash for 1 second
-    }
-
-        if (isFlashing && spriteRenderer != null)
-        {
-            flashTimer -= Time.deltaTime;
-            if (flashTimer > 0f)
-            {
-                if (!spriteRenderer.enabled)
+                if (spriteRenderer.enabled)
                 {
                     spriteRenderer.enabled = true;
                 }
-                spriteRenderer.color = flashColor;
-            }
-            else
-            {
-                if (spriteRenderer.enabled)
-                {
-                    spriteRenderer.enabled = false;
-                }
-                spriteRenderer.color = originalColor;
-                isFlashing = false;
-            }
-        }
-    }
-
-    private bool IsWithinCameraBounds()
-    {
-        Camera cam = Camera.main;
-        if (cam == null) return false;
-
-        Vector3 viewportPos = cam.WorldToViewportPoint(transform.position);
-        return viewportPos.x >= 0f && viewportPos.x <= 1f &&
-               viewportPos.y >= 0f && viewportPos.y <= 1f &&
-               viewportPos.z > 0f;
-    }
-
-    private void StartFlash()
-    {
-        isFlashing = true;
-        flashTimer = 1f; // Flash for 1 second
-    }
-
-        if (isFlashing && spriteRenderer != null)
-        {
-            flashTimer -= Time.deltaTime;
-            if (flashTimer > 0f)
-            {
-                if (!spriteRenderer.enabled)
-                {
-                    spriteRenderer.enabled = true;
-                }
-                spriteRenderer.color = flashColor;
-            }
-            else
-            {
-                if (spriteRenderer.enabled)
-                {
-                    spriteRenderer.enabled = false;
-                }
-                spriteRenderer.color = originalColor;
-                isFlashing = false;
-            }
-        }
-    }
-
-    private bool IsWithinCameraBounds()
-    {
-        Camera cam = Camera.main;
-        if (cam == null) return false;
-
-        Vector3 viewportPos = cam.WorldToViewportPoint(transform.position);
-        return viewportPos.x >= 0f && viewportPos.x <= 1f &&
-               viewportPos.y >= 0f && viewportPos.y <= 1f &&
-               viewportPos.z > 0f;
-    }
-
-    private void StartFlash()
-    {
-        isFlashing = true;
-        flashTimer = 1f; // Flash for 1 second
-    }
-
-        if (isFlashing && spriteRenderer != null)
-        {
-            flashTimer -= Time.deltaTime;
-            if (flashTimer > 0f)
-            {
-                if (!spriteRenderer.enabled)
-                {
-                    spriteRenderer.enabled = true;
-                }
-                spriteRenderer.color = flashColor;
-            }
-            else
-            {
-                if (spriteRenderer.enabled)
-                {
-                    spriteRenderer.enabled = false;
-                }
-                spriteRenderer.color = originalColor;
-                isFlashing = false;
-            }
-        }
-    }
-
-    private bool IsWithinCameraBounds()
-    {
-        Camera cam = Camera.main;
-        if (cam == null) return false;
-
-        Vector3 viewportPos = cam.WorldToViewportPoint(transform.position);
-        return viewportPos.x >= 0f && viewportPos.x <= 1f &&
-               viewportPos.y >= 0f && viewportPos.y <= 1f &&
-               viewportPos.z > 0f;
-    }
-
-    private void StartFlash()
-    {
-        isFlashing = true;
-        flashTimer = 1f; // Flash for 1 second
-    }
-
-        if (isFlashing && spriteRenderer != null)
-        {
-            flashTimer -= Time.deltaTime;
-            if (flashTimer > 0f)
-            {
-                if (!spriteRenderer.enabled)
-                {
-                    spriteRenderer.enabled = true;
-                }
-                spriteRenderer.color = flashColor;
-            }
-            else
-            {
-                if (spriteRenderer.enabled)
-                {
-                    spriteRenderer.enabled = false;
-                }
-                spriteRenderer.color = originalColor;
-                isFlashing = false;
             }
         }
     }
@@ -244,7 +85,7 @@ public class Zomboss : Enemy
         CurrentSpeed = Mathf.Lerp(MaxSpeed * 0.25f, MaxSpeed, 1f - yellowFactor);
     }
 
-    public void Die()
+    public override void Die()
     {
         // Publish the ZombossDiedEvent
         EventBus.Publish(new ZombossDiedEvent { Sender = this });

@@ -1,22 +1,85 @@
 using System;
-using JetBrains.Annotations;
+using System.Collections.Generic;
 
-public interface IGameEventArgs { }
-public abstract class BaseGameEvent : IGameEventArgs
+public static class EventBus
 {
-    public DateTime TimeStamp { get; } = DateTime.Now;
+    private static readonly Dictionary<Type, Delegate> _events = new Dictionary<Type, Delegate>();
+    private static readonly Dictionary<Type, List<Delegate>> _interfaceEvents = new Dictionary<Type, List<Delegate>>();
 
-    // Sender is virtual so that it can be overridden in derived classes
-    // This is useful when you want to statically type the sender in the event
-    [CanBeNull] public virtual object Sender { get; set; }
-}
+    public static void Subscribe<TGameEventArgs>(Action<TGameEventArgs> handler) where TGameEventArgs : IGameEventArgs
+    {
+        var eventType = typeof(TGameEventArgs);
+        if (eventType.IsInterface)
+        {
+            if (!_interfaceEvents.ContainsKey(eventType))
+            {
+                _interfaceEvents[eventType] = new List<Delegate>();
+            }
+            _interfaceEvents[eventType].Add(handler);
+        }
+        else
+        {
+            if (_events.ContainsKey(eventType))
+            {
+                _events[eventType] = Delegate.Combine(_events[eventType], handler);
+            }
+            else
+            {
+                _events[eventType] = handler;
+            }
+        }
+    }
 
-public class GenericGameEvent : BaseGameEvent
-{
-    public string Message { get; set; }
-}
+    public static void Unsubscribe<TGameEventArgs>(Action<TGameEventArgs> handler) where TGameEventArgs : IGameEventArgs
+    {
+        var eventType = typeof(TGameEventArgs);
+        if (eventType.IsInterface)
+        {
+            if (_interfaceEvents.ContainsKey(eventType))
+            {
+                _interfaceEvents[eventType].Remove(handler);
+                if (_interfaceEvents[eventType].Count == 0)
+                {
+                    _interfaceEvents.Remove(eventType);
+                }
+            }
+        }
+        else
+        {
+            if (_events.ContainsKey(eventType))
+            {
+                var currentDelegate = _events[eventType];
+                var newDelegate = Delegate.Remove(currentDelegate, handler);
+                if (newDelegate == null)
+                {
+                    _events.Remove(eventType);
+                }
+                else
+                {
+                    _events[eventType] = newDelegate;
+                }
+            }
+        }
+    }
 
-public class ZombossDiedEvent : BaseGameEvent
-{
-    public new Zomboss Sender { get; set; } // overridden Sender to specify the sender type
+    public static void Publish<TGameEventArgs>(TGameEventArgs eventArgs) where TGameEventArgs : IGameEventArgs
+    {
+        var eventType = typeof(TGameEventArgs);
+        if (_events.ContainsKey(eventType))
+        {
+            var handler = _events[eventType] as Action<TGameEventArgs>;
+            handler?.Invoke(eventArgs);
+        }
+
+        foreach (var interfaceType in _interfaceEvents.Keys)
+        {
+            if (interfaceType.IsAssignableFrom(eventType))
+            {
+                foreach (var handler in _interfaceEvents[interfaceType])
+                {
+                    (handler as Action<TGameEventArgs>)?.Invoke(eventArgs);
+                }
+            }
+        }
+    }
 }

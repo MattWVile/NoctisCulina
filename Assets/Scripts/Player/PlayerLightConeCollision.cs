@@ -40,7 +40,6 @@ public class PlayerLightConeCollision : MonoBehaviour
             if (zombie != null)
             {
                 zombie.IsInLightCone = false;
-                zombie.UpdateSpriteRendererState();
                 HandleZombieExit(zombie);
 
                 // Start delayed sprite disable
@@ -59,8 +58,16 @@ public class PlayerLightConeCollision : MonoBehaviour
             if (zomboss != null)
             {
                 zomboss.IsInLightCone = false;
-                zomboss.UpdateSpriteRendererState();
                 HandleZombossExit(zomboss);
+
+                // Start delayed sprite disable
+                if (zombossExitCoroutines.ContainsKey(zomboss))
+                {
+                    StopCoroutine(zombossExitCoroutines[zomboss]);
+                    zombossExitCoroutines.Remove(zomboss);
+                }
+                Coroutine coroutine = StartCoroutine(DelayedSpriteDisable(zomboss));
+                zombossExitCoroutines[zomboss] = coroutine;
             }
         }
     }
@@ -73,6 +80,14 @@ public class PlayerLightConeCollision : MonoBehaviour
             if (zombie != null)
             {
                 zombie.IsInLightCone = true;
+
+                // Cancel delayed sprite disable if re-entered
+                if (zombieExitCoroutines.ContainsKey(zombie))
+                {
+                    StopCoroutine(zombieExitCoroutines[zombie]);
+                    zombieExitCoroutines.Remove(zombie);
+                }
+
                 zombie.UpdateSpriteRendererState();
                 HandleZombieEnterOrStay(zombie);
             }
@@ -83,6 +98,14 @@ public class PlayerLightConeCollision : MonoBehaviour
             if (zomboss != null)
             {
                 zomboss.IsInLightCone = true;
+
+                // Cancel delayed sprite disable if re-entered
+                if (zombossExitCoroutines.ContainsKey(zomboss))
+                {
+                    StopCoroutine(zombossExitCoroutines[zomboss]);
+                    zombossExitCoroutines.Remove(zomboss);
+                }
+
                 zomboss.UpdateSpriteRendererState();
                 HandleZombossEnterOrStay(zomboss);
             }
