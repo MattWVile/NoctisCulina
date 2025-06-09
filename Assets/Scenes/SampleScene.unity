@@ -152,6 +152,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zombiePrefab: {fileID: 8180261063808567810, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
+  zombossPrefab: {fileID: 8180261063808567810, guid: 62e9f3bda6570ba4281b76d0389a19dc, type: 3}
   spawnInterval: 1
   toggleTimer: 100
   toggleKey: 116
