@@ -85,30 +85,32 @@ public class PlayerHealthController : MonoBehaviour
             Debug.Log("Player is dead!");
             // Handle player death logic here
         }
-        else
+
+        // Remove hearts based on the amount of health lost
+        for (int i = 0; i < amount && hearts.Count > 0; i++)
         {
-            RemoveHeart(); // Remove a heart when taking damage
-            Debug.Log("Player took damage! Current health: " + playerCurrentHealth);
+            RemoveHeart();
+        }
+        Debug.Log("Player took damage! Current health: " + playerCurrentHealth);
 
-            // Destroy all nearby enemies when the player takes damage
-            if (lightCircleRenderer != null && lightCircleCollision != null)
-            { 
-                // Flash the player's light circle to red for 1 second
-                if (flashCoroutine != null)
-                {
-                    StopCoroutine(flashCoroutine); // Stop any ongoing flash
-                }
-
-                flashCoroutine = ColorChangeUtility.FlashColorForSeconds(
-                    this,
-                    lightCircleRenderer,
-                    colourToFlash,
-                    .15f,
-                    lightCircleRenderer.color // Reset to the original color
-                );
-
-                lightCircleCollision.DestroyAllNearbyEnemies();
+        // Destroy all nearby enemies when the player takes damage
+        if (lightCircleRenderer != null && lightCircleCollision != null)
+        {
+            // Flash the player's light circle to red for 1 second
+            if (flashCoroutine != null)
+            {
+                StopCoroutine(flashCoroutine); // Stop any ongoing flash
             }
+
+            flashCoroutine = ColorChangeUtility.FlashColorForSeconds(
+                this,
+                lightCircleRenderer,
+                colourToFlash,
+                .15f,
+                lightCircleRenderer.color // Reset to the original color
+            );
+
+            lightCircleCollision.DestroyAllNearbyEnemies();
         }
     }
 }

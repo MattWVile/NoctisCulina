@@ -8,6 +8,8 @@ public abstract class Enemy : MonoBehaviour
     public float Damage { get; protected set; }
     public float MaxSpeed { get; protected set; }
     public float CurrentSpeed { get; set; }
+    public int  ScoreWhenKilled { get; set; }
+    public int ScoreWhenColurChanged { get; set; }
 
     // New boolean to track if the color has fully changed
     public bool IsColorFullyChanged { get; private set; } = false;
@@ -27,20 +29,9 @@ public abstract class Enemy : MonoBehaviour
         }
     }
 
-    private void AddScore(int score)
-    {
-        if (ScoreController.Instance != null)
-        {
-            ScoreController.Instance.AddScore(score);
-        }
-        else
-        {
-            Debug.LogError("ScoreController instance not found.");
-        }
-    }
-
     public virtual void Die()
     {
+        AddScore(ScoreWhenKilled);
         Destroy(gameObject);
     }
 
@@ -76,6 +67,18 @@ public abstract class Enemy : MonoBehaviour
         if (spriteRenderer != null)
         {
             spriteRenderer.enabled = true;
+        }
+        AddScore(ScoreWhenColurChanged);
+    }
+    protected void AddScore(int score)
+    {
+        if (ScoreController.Instance != null)
+        {
+            ScoreController.Instance.AddScore(score);
+        }
+        else
+        {
+            Debug.LogError("ScoreController instance not found.");
         }
     }
 }

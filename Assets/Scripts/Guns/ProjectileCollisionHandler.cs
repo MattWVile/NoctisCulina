@@ -4,7 +4,11 @@ public class ProjectileCollisionHandler : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Enemy"))
+        if (other.CompareTag("Zombie"))
+        {
+            HandleEnemyCollision(other);
+        }        
+        if (other.CompareTag("Zomboss"))
         {
             HandleEnemyCollision(other);
         }
@@ -26,21 +30,6 @@ public class ProjectileCollisionHandler : MonoBehaviour
 
             // Handle projectile-specific collision behavior
             projectile.HandleCollisionWithEnemy(enemyCollider);
-
-            // Add score
-            AddScore(100);
-        }
-    }
-
-    private void AddScore(int score)
-    {
-        if (ScoreController.Instance != null)
-        {
-            ScoreController.Instance.AddScore(score);
-        }
-        else
-        {
-            Debug.LogError("ScoreController instance not found.");
         }
     }
 }

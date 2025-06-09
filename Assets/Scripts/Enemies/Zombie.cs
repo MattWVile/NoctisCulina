@@ -9,7 +9,16 @@ public class Zombie : Enemy
         MaxSpeed = 1f;
         CurrentSpeed = MaxSpeed;
         GetComponent<SpriteRenderer>().enabled = false;
+        ScoreWhenColurChanged = 300;
+        ScoreWhenKilled = 100;
     }
+    public void SetSpeedToZero()
+    {
+        if (CurrentSpeed == 0f)
+        {
+            return; // Speed is already zero, no need to set it again
+        }
 
-    // Additional behavior specific to Zombie
+        CurrentSpeed = 0f; // Set this zombie's speed to zero
+    }
 }

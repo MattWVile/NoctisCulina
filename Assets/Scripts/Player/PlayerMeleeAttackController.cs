@@ -9,7 +9,7 @@ public class PlayerMeleeAttackController : MonoBehaviour
     public GameObject rightCollider;
 
     private bool canAttack = true;
-    private float attackCooldown = 2.6f;
+    private float attackCooldown = 3.6f;
 
     void Update()
     {

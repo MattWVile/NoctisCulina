@@ -55,11 +55,11 @@ GameObject:
   - component: {fileID: 6984041432663159274}
   - component: {fileID: 5924790275212165570}
   - component: {fileID: 5205735686713877962}
-  - component: {fileID: 4300620221895516712}
   - component: {fileID: 3600116983364630981}
+  - component: {fileID: 7068965765502189061}
   m_Layer: 0
-  m_Name: Zombie
-  m_TagString: Zombie
+  m_Name: Zomboss
+  m_TagString: Zomboss
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -74,7 +74,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.25, y: 0.37878788, z: 0.37878788}
+  m_LocalScale: {x: 0.48, y: 0.7272727, z: 0.7272727}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 3859627561485218473}
@@ -159,18 +159,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &4300620221895516712
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8180261063808567810}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e4f7259e87305374ab26e7d72377f926, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!70 &3600116983364630981
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -206,3 +194,15 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Size: {x: 1, y: 1}
   m_Direction: 0
+--- !u!114 &7068965765502189061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8180261063808567810}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7eefbe2fec3b4714ea5d465b5998ac21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
