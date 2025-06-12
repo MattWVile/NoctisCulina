@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -6,9 +7,14 @@ public class GameManager : MonoBehaviour
 
     public bool IsGamePaused { get; private set; } = true;
 
+    [Header("Player")]
+    public GameObject playerPrefab; // Assign your player prefab in the Inspector
+    public Vector3 playerSpawnPosition = Vector3.zero; // Set your default spawn position
+
     [SerializeField] private GameObject startScreenUI;
-    [SerializeField] private GameObject scoreUI;      // Add this line
-    [SerializeField] private GameObject waveTimerUI;  // Add this line
+    [SerializeField] private GameObject scoreUI;
+    [SerializeField] private GameObject waveTimerUI;
+    [SerializeField] private GameObject PauseScreenUI;
 
     private void Awake()
     {
@@ -23,7 +29,7 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-        PauseGame();
+        LoadStartScreen();
     }
 
     private void Update()
@@ -32,9 +38,26 @@ public class GameManager : MonoBehaviour
         {
             ResumeGame();
         }
+        // Allow pausing with Escape key
+        else if (!IsGamePaused && Input.GetKeyDown(KeyCode.Escape))
+        {
+            PauseGame();
+        }
     }
 
     public void PauseGame()
+    {
+        Time.timeScale = 0f;
+        IsGamePaused = true;
+
+        if (PauseScreenUI != null)
+        {
+            PauseScreenUI.SetActive(true);
+        }
+        EnableGameUI(false);
+    }
+
+    public void LoadStartScreen()
     {
         Time.timeScale = 0f;
         IsGamePaused = true;
@@ -43,13 +66,11 @@ public class GameManager : MonoBehaviour
         {
             startScreenUI.SetActive(true);
         }
-        if (scoreUI != null)
+        EnableGameUI(false);
+
+        if (PauseScreenUI != null)
         {
-            scoreUI.SetActive(false); // Hide score when paused
-        }
-        if (waveTimerUI != null)
-        {
-            waveTimerUI.SetActive(false); // Hide timer when paused
+            PauseScreenUI.SetActive(false);
         }
     }
 
@@ -62,17 +83,66 @@ public class GameManager : MonoBehaviour
         {
             startScreenUI.SetActive(false);
         }
-        EnableGameUI();
+        EnableGameUI(true);
     }
-    public void EnableGameUI()
+
+    public void EnableGameUI(bool enabled)
     {
         if (scoreUI != null)
         {
-            scoreUI.SetActive(true); // Show score when resumed
+            scoreUI.SetActive(enabled);
         }
         if (waveTimerUI != null)
         {
-            waveTimerUI.SetActive(true); // Show timer when resumed
+            waveTimerUI.SetActive(enabled);
         }
+    }
+
+    public void FullRestart()
+    {
+        GameObject oldPlayer = GameObject.FindGameObjectWithTag("Player");
+        if (oldPlayer != null)
+        {
+            Destroy(oldPlayer);
+        }
+
+        GameObject newPlayer = null;
+        if (playerPrefab != null)
+        {
+            newPlayer = Instantiate(playerPrefab, playerSpawnPosition, Quaternion.identity);
+        }
+
+        // Set the new player in the camera follow script
+        CameraFollow cameraFollow = FindObjectOfType<CameraFollow>();
+        if (cameraFollow != null && newPlayer != null)
+        {
+            cameraFollow.SetPlayer(newPlayer.transform);
+        }        
+        EnemyMovementController enemyMovementController = FindObjectOfType<EnemyMovementController>();
+        if (enemyMovementController != null && newPlayer != null)
+        {
+            enemyMovementController.SetPlayer(newPlayer);
+        }
+
+        // Reset score
+        if (ScoreController.Instance != null)
+            ScoreController.Instance.ResetScore();
+
+
+        EnemySpawner enemySpawner = FindObjectOfType<EnemySpawner>();
+        if (enemySpawner != null)
+            enemySpawner.ResetSpawner();
+
+        // Hide all UI except start screen
+        EnableGameUI(false);
+
+        if (startScreenUI != null)
+            startScreenUI.SetActive(true);
+
+        if (PauseScreenUI != null)
+            PauseScreenUI.SetActive(false);
+
+        // Pause the game
+        Time.timeScale = 0f;
     }
 }

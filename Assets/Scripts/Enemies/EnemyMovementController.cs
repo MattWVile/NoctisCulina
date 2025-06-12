@@ -30,4 +30,8 @@ public class EnemyMovementController : MonoBehaviour
             rootRigidbody2D.velocity = direction * enemy.CurrentSpeed;
         }
     }
+    public void SetPlayer(GameObject newPlayer)
+    {
+        player = newPlayer;
+    }
 }
