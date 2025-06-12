@@ -35,25 +35,17 @@ public class EnemySpawner : MonoBehaviour
 
     void Start()
     {
-        spawnTimer = spawnInterval;
-        toggleTimerCountdown = toggleTimer;
-        zombossesSpawnedThisRound = 0;
-        zombossesDiedThisRound = 0;
-        waitingForSecondZomboss = false;
-
-        // Set random timer for first Zomboss spawn
-        firstZombossTimer = Random.Range(5f, 10f);
-        waitingForFirstZomboss = true;
+        ResetSpawner();
     }
 
     void Update()
     {
         // Handle manual toggle with a key press
-        if (Input.GetKeyDown(toggleKey))
-        {
-            spawningEnabled = !spawningEnabled;
-            Debug.Log("Spawning toggled: " + (spawningEnabled ? "Enabled" : "Disabled"));
-        }
+        //if (Input.GetKeyDown(toggleKey))
+        //{
+        //    spawningEnabled = !spawningEnabled;
+        //    Debug.Log("Spawning toggled: " + (spawningEnabled ? "Enabled" : "Disabled"));
+        //}
 
         // Handle automatic toggle on a timer
         toggleTimerCountdown -= Time.deltaTime;
@@ -177,5 +169,39 @@ public class EnemySpawner : MonoBehaviour
 
         return spawnPosition;
     }
-}
+    public void ResetSpawner()
+    {
+        // Reset timers and state
+        spawnTimer = spawnInterval;
+        toggleTimerCountdown = toggleTimer;
+        zombossesSpawnedThisRound = 0;
+        zombossesDiedThisRound = 0;
+        waitingForSecondZomboss = false;
+        waitingForFirstZomboss = true;
+        firstZombossTimer = Random.Range(5f, 10f);
+        secondZombossTimer = 0f;
+        spawningEnabled = true;
 
+        // Reset wave timer UI
+        if (waveTimerText != null)
+            waveTimerText.text = "Wave Timer: " + Mathf.Ceil(toggleTimerCountdown).ToString();
+
+        // Despawn all enemies
+        DespawnAllEnemies();
+    }
+
+    private void DespawnAllEnemies()
+    {
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Zombie");
+        foreach (var enemy in enemies)
+        {
+            Destroy(enemy);
+        }
+
+        GameObject[] zombosses = GameObject.FindGameObjectsWithTag("Zomboss");
+        foreach (var zomboss in zombosses)
+        {
+            Destroy(zomboss);
+        }
+    }
+}

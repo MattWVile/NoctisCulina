@@ -15,4 +15,9 @@ public class CameraFollow : MonoBehaviour
         // Update the camera's position to follow the player with the specified offset
         transform.position = player.position + offset;
     }
+
+    public void SetPlayer(Transform newPlayer)
+    {
+        player = newPlayer;
+    }
 }

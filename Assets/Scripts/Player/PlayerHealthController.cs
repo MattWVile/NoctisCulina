@@ -21,7 +21,8 @@ public class PlayerHealthController : MonoBehaviour
         }
         else
         {
-            Destroy(gameObject);
+            Destroy(Instance);
+            Instance = this;
         }
     }
 
