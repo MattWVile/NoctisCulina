@@ -998,7 +998,7 @@ MonoBehaviour:
     yellow enemies stay lit
 
 
-    Click to start'
+    Hit space to start'
 --- !u!222 &661435688
 CanvasRenderer:
   m_ObjectHideFlags: 0
