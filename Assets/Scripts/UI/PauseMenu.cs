@@ -3,12 +3,9 @@ using UnityEngine.SceneManagement;
 
 public class PauseMenu : MonoBehaviour
 {
-    private bool isPaused = true;
-
     private void Update()
     {
-
-        if (isPaused)
+        if (GameManager.Instance.IsGamePaused)
         {
             if (Input.GetKeyDown(KeyCode.Space))
                 Resume();
@@ -23,20 +20,16 @@ public class PauseMenu : MonoBehaviour
 
     public void Resume()
     {
-        isPaused = false;
-        Time.timeScale = 1f;
         GameManager.Instance.ResumeGame();
     }
 
     public void Pause()
     {
-        isPaused = true;
-        Time.timeScale = 0f;
+        GameManager.Instance.PauseGame();
     }
 
     public void Restart()
     {
-        isPaused = false;
         GameManager.Instance.FullRestart();
     }
 
@@ -47,7 +40,6 @@ public class PauseMenu : MonoBehaviour
 #else
         Application.Quit();
 #endif
-        isPaused = false;
         Time.timeScale = 1f;
     }
 }
