@@ -50,7 +50,7 @@ public class PlayerLightCircleCollision : MonoBehaviour
     }
 
     // Method to deal 20 damage to all nearby enemies
-    public void DestroyAllNearbyEnemies()
+    public void DamageAllNearbyEnemies()
     {
         List<GameObject> enemiesToDamage = new List<GameObject>(enemiesInCircle);
 

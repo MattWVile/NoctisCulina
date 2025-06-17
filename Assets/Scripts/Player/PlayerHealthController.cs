@@ -111,7 +111,7 @@ public class PlayerHealthController : MonoBehaviour
                 lightCircleRenderer.color // Reset to the original color
             );
 
-            lightCircleCollision.DestroyAllNearbyEnemies();
+            lightCircleCollision.DamageAllNearbyEnemies();
         }
     }
 }
