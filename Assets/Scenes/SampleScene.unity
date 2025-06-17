@@ -289,6 +289,9 @@ GameObject:
   - component: {fileID: 120299409}
   - component: {fileID: 120299410}
   - component: {fileID: 120299411}
+  - component: {fileID: 120299414}
+  - component: {fileID: 120299413}
+  - component: {fileID: 120299412}
   m_Layer: 0
   m_Name: UpCone
   m_TagString: MeleeAttack
@@ -380,7 +383,70 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aa454d5e3b0fd84f9e39789aa8cfe86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageAmount: 11
+  damageAmount: 33
+--- !u!114 &120299412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 120299408}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d90a6ec45aa0dd445b45f5c8b6aaa032, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fillColor: {r: 1, g: 1, b: 1, a: 0.3}
+--- !u!23 &120299413
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 120299408}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &120299414
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 120299408}
+  m_Mesh: {fileID: 0}
 --- !u!4 &170127252 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1763967227987636396, guid: fd9059ef802a2ab45a5cfdf264c3a210, type: 3}
@@ -397,6 +463,9 @@ GameObject:
   - component: {fileID: 205163216}
   - component: {fileID: 205163218}
   - component: {fileID: 205163217}
+  - component: {fileID: 205163221}
+  - component: {fileID: 205163220}
+  - component: {fileID: 205163219}
   m_Layer: 0
   m_Name: LeftCone
   m_TagString: MeleeAttack
@@ -431,7 +500,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aa454d5e3b0fd84f9e39789aa8cfe86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageAmount: 11
+  damageAmount: 33
 --- !u!60 &205163218
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -489,6 +558,69 @@ PolygonCollider2D:
       - {x: -0.0028021336, y: 0.01660037}
       - {x: 1.3201575, y: 1.1234148}
   m_UseDelaunayMesh: 0
+--- !u!114 &205163219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 205163215}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d90a6ec45aa0dd445b45f5c8b6aaa032, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fillColor: {r: 1, g: 1, b: 1, a: 0.2784314}
+--- !u!23 &205163220
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 205163215}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &205163221
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 205163215}
+  m_Mesh: {fileID: 0}
 --- !u!1 &360168103
 GameObject:
   m_ObjectHideFlags: 0
@@ -500,6 +632,9 @@ GameObject:
   - component: {fileID: 360168104}
   - component: {fileID: 360168106}
   - component: {fileID: 360168105}
+  - component: {fileID: 360168109}
+  - component: {fileID: 360168108}
+  - component: {fileID: 360168107}
   m_Layer: 0
   m_Name: DownCone
   m_TagString: MeleeAttack
@@ -534,7 +669,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aa454d5e3b0fd84f9e39789aa8cfe86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageAmount: 11
+  damageAmount: 33
 --- !u!60 &360168106
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -592,6 +727,69 @@ PolygonCollider2D:
       - {x: -0.0028021336, y: 0.01660037}
       - {x: 1.3201575, y: 1.1234148}
   m_UseDelaunayMesh: 0
+--- !u!114 &360168107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 360168103}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d90a6ec45aa0dd445b45f5c8b6aaa032, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fillColor: {r: 1, g: 1, b: 1, a: 0.3}
+--- !u!23 &360168108
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 360168103}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &360168109
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 360168103}
+  m_Mesh: {fileID: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -962,6 +1160,9 @@ GameObject:
   - component: {fileID: 935860293}
   - component: {fileID: 935860295}
   - component: {fileID: 935860294}
+  - component: {fileID: 935860298}
+  - component: {fileID: 935860297}
+  - component: {fileID: 935860296}
   m_Layer: 0
   m_Name: RightCone
   m_TagString: MeleeAttack
@@ -996,7 +1197,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aa454d5e3b0fd84f9e39789aa8cfe86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageAmount: 11
+  damageAmount: 33
 --- !u!60 &935860295
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -1054,6 +1255,69 @@ PolygonCollider2D:
       - {x: -0.0028021336, y: 0.01660037}
       - {x: 1.3201575, y: 1.1234148}
   m_UseDelaunayMesh: 0
+--- !u!114 &935860296
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 935860292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d90a6ec45aa0dd445b45f5c8b6aaa032, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fillColor: {r: 1, g: 1, b: 1, a: 0.2784314}
+--- !u!23 &935860297
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 935860292}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &935860298
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 935860292}
+  m_Mesh: {fileID: 0}
 --- !u!1 &975249637
 GameObject:
   m_ObjectHideFlags: 0
@@ -1370,7 +1634,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerPrefab: {fileID: 2082825153331691654, guid: fd9059ef802a2ab45a5cfdf264c3a210, type: 3}
   playerSpawnPosition: {x: 0, y: 0, z: 0}
-  enemySpawner: {fileID: 21088817}
   startScreenUI: {fileID: 661435685}
   scoreUI: {fileID: 673034343}
   waveTimerUI: {fileID: 1407651414}
@@ -1482,6 +1745,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1693470170106167174, guid: fd9059ef802a2ab45a5cfdf264c3a210, type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1693470170106167174, guid: fd9059ef802a2ab45a5cfdf264c3a210, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1693470170106167174, guid: fd9059ef802a2ab45a5cfdf264c3a210, type: 3}
+      propertyPath: m_SortingLayerID
+      value: -321758913
+      objectReference: {fileID: 0}
     - target: {fileID: 1763967227987636396, guid: fd9059ef802a2ab45a5cfdf264c3a210, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1522,9 +1797,73 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1830103794036556414, guid: fd9059ef802a2ab45a5cfdf264c3a210, type: 3}
+      propertyPath: topCollider
+      value: 
+      objectReference: {fileID: 120299408}
+    - target: {fileID: 1830103794036556414, guid: fd9059ef802a2ab45a5cfdf264c3a210, type: 3}
+      propertyPath: downCollider
+      value: 
+      objectReference: {fileID: 360168103}
+    - target: {fileID: 1830103794036556414, guid: fd9059ef802a2ab45a5cfdf264c3a210, type: 3}
+      propertyPath: leftCollider
+      value: 
+      objectReference: {fileID: 205163215}
+    - target: {fileID: 1830103794036556414, guid: fd9059ef802a2ab45a5cfdf264c3a210, type: 3}
+      propertyPath: rightCollider
+      value: 
+      objectReference: {fileID: 935860292}
     - target: {fileID: 2082825153331691654, guid: fd9059ef802a2ab45a5cfdf264c3a210, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 3645523775312345067, guid: fd9059ef802a2ab45a5cfdf264c3a210, type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3645523775312345067, guid: fd9059ef802a2ab45a5cfdf264c3a210, type: 3}
+      propertyPath: m_SortingOrder
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3645523775312345067, guid: fd9059ef802a2ab45a5cfdf264c3a210, type: 3}
+      propertyPath: m_SortingLayerID
+      value: -321758913
+      objectReference: {fileID: 0}
+    - target: {fileID: 3764998479261152154, guid: fd9059ef802a2ab45a5cfdf264c3a210, type: 3}
+      propertyPath: m_SortingOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4387682764054354194, guid: fd9059ef802a2ab45a5cfdf264c3a210, type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4387682764054354194, guid: fd9059ef802a2ab45a5cfdf264c3a210, type: 3}
+      propertyPath: m_SortingOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4387682764054354194, guid: fd9059ef802a2ab45a5cfdf264c3a210, type: 3}
+      propertyPath: m_SortingLayerID
+      value: -321758913
+      objectReference: {fileID: 0}
+    - target: {fileID: 6787670823818013552, guid: fd9059ef802a2ab45a5cfdf264c3a210, type: 3}
+      propertyPath: m_SortingOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8428447399334907418, guid: fd9059ef802a2ab45a5cfdf264c3a210, type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8428447399334907418, guid: fd9059ef802a2ab45a5cfdf264c3a210, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8428447399334907418, guid: fd9059ef802a2ab45a5cfdf264c3a210, type: 3}
+      propertyPath: m_SortingLayerID
+      value: -321758913
+      objectReference: {fileID: 0}
+    - target: {fileID: 8750726826662819041, guid: fd9059ef802a2ab45a5cfdf264c3a210, type: 3}
+      propertyPath: m_SortingOrder
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1539,6 +1878,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5924790275212165570, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5924790275212165570, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
+      propertyPath: m_SortingLayerID
+      value: -321758913
+      objectReference: {fileID: 0}
     - target: {fileID: 6984041432663159274, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
       propertyPath: m_LocalPosition.x
       value: -1.68
