@@ -25,6 +25,7 @@ public abstract class Tower : MonoBehaviour
 
     // Derived classes should implement their own attack logic
     protected abstract void TryAttack();
+
     protected Transform FindNearestEnemyInRange()
     {
         Enemy[] enemies = GameObject.FindObjectsOfType<Enemy>();

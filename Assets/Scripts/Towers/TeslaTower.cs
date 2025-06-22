@@ -2,16 +2,13 @@ using UnityEngine;
 using System.Collections.Generic;
 
 [RequireComponent(typeof(LineRenderer))]
-[RequireComponent(typeof(CircleCollider2D))]
 public class TeslaTower : Tower
 {
     private LineRenderer lineRenderer;
-    private CircleCollider2D rangeCollider;
     private float lineDisplayTime = 0.1f;
     private float lineTimer = 0f;
 
-    [SerializeField] private Transform rangeIndicator;
-    [SerializeField] public float rangeIndicatorScaleFactor = 2f;
+    [SerializeField] private RangeController rangeIndicator;
 
     private readonly List<Enemy> enemiesInRange = new List<Enemy>();
 
@@ -29,18 +26,10 @@ public class TeslaTower : Tower
         lineRenderer.startColor = Color.cyan;
         lineRenderer.endColor = Color.white;
 
-        rangeCollider = GetComponent<CircleCollider2D>();
-        rangeCollider.isTrigger = true;
-        rangeCollider.radius = range;
-
         if (rangeIndicator == null)
-            rangeIndicator = transform.Find("Range");
-
+            rangeIndicator = GetComponentInChildren<RangeController>();
         if (rangeIndicator != null)
-        {
-            float diameter = range * rangeIndicatorScaleFactor;
-            rangeIndicator.localScale = new Vector3(diameter, diameter, 1f);
-        }
+            rangeIndicator.SetRange(range);
     }
 
     protected override void Update()
@@ -55,15 +44,9 @@ public class TeslaTower : Tower
                 lineRenderer.enabled = false;
             }
         }
+
         if (rangeIndicator != null)
-        {
-            float diameter = range * rangeIndicatorScaleFactor;
-            rangeIndicator.localScale = new Vector3(diameter, diameter, 1f);
-        }
-        if (rangeCollider.radius != range)
-        {
-            rangeCollider.radius = range;
-        }
+            rangeIndicator.SetRange(range);
     }
 
     protected override void TryAttack()
@@ -98,7 +81,8 @@ public class TeslaTower : Tower
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    // Called by RangeIndicator
+    public void OnRangeTriggerEnter(Collider2D other)
     {
         Enemy enemy = other.GetComponent<Enemy>();
         if (enemy != null && !enemiesInRange.Contains(enemy))
@@ -107,7 +91,8 @@ public class TeslaTower : Tower
         }
     }
 
-    private void OnTriggerExit2D(Collider2D other)
+    // Called by RangeIndicator
+    public void OnRangeTriggerExit(Collider2D other)
     {
         Enemy enemy = other.GetComponent<Enemy>();
         if (enemy != null)
