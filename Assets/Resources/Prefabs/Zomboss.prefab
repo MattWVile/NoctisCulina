@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3859627561485218473}
   - component: {fileID: 7111161934463967780}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: EnemyMovement
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -57,7 +57,7 @@ GameObject:
   - component: {fileID: 5205735686713877962}
   - component: {fileID: 3600116983364630981}
   - component: {fileID: 7068965765502189061}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Zomboss
   m_TagString: Zomboss
   m_Icon: {fileID: 0}
@@ -206,3 +206,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7eefbe2fec3b4714ea5d465b5998ac21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  flashColor: {r: 1, g: 1, b: 1, a: 1}
