@@ -1436,13 +1436,33 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4615061231610574887, guid: 9c7786ef8cabeb14091e9590b897d57b, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].time
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4615061231610574887, guid: 9c7786ef8cabeb14091e9590b897d57b, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].value
+      value: 0.07727432
+      objectReference: {fileID: 0}
+    - target: {fileID: 7238363218050380999, guid: 9c7786ef8cabeb14091e9590b897d57b, type: 3}
+      propertyPath: damage
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7238363218050380999, guid: 9c7786ef8cabeb14091e9590b897d57b, type: 3}
       propertyPath: fireRate
       value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 7238363218050380999, guid: 9c7786ef8cabeb14091e9590b897d57b, type: 3}
+      propertyPath: towerRange
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 7238363218050380999, guid: 9c7786ef8cabeb14091e9590b897d57b, type: 3}
       propertyPath: targetingMode
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7238363218050380999, guid: 9c7786ef8cabeb14091e9590b897d57b, type: 3}
+      propertyPath: attacksPerSecond
+      value: 1.2
       objectReference: {fileID: 0}
     - target: {fileID: 8261026804591229847, guid: 9c7786ef8cabeb14091e9590b897d57b, type: 3}
       propertyPath: m_Name

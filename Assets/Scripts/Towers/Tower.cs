@@ -12,8 +12,8 @@ public abstract class Tower : MonoBehaviour
     }
 
     [Header("Tower Stats")]
-    [SerializeField] protected float towerRange = 5f;
-    [SerializeField] protected float damage = 10f;
+    [SerializeField] protected float towerRange = 20f;
+    [SerializeField] protected float damage = 1f;
     [SerializeField] protected float attacksPerSecond = 1f;
     [SerializeField] protected TargetingMode targetingMode = TargetingMode.Closest;
 

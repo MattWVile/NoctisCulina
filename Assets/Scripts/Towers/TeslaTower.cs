@@ -1,13 +1,14 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Collections;
 
 [RequireComponent(typeof(LineRenderer))]
 public class TeslaTower : Tower
 {
     [SerializeField]
-    private LineRenderer lineRenderer;
-    private float lineDisplayTime = .05f;
+    private GameObject lineRendererPrefab; // Assign a prefab with a LineRenderer in the inspector
+
+    [SerializeField]
+    private float lineDisplayTime = 0.08f;
     private float lineTimer = 0f;
 
     [SerializeField]
@@ -19,17 +20,32 @@ public class TeslaTower : Tower
     [SerializeField]
     private int maxArcsPerEnemy; // How many arcs branch from each hit enemy
 
+    [Header("Tesla Visuals")]
+    [SerializeField]
+    private float spriteActiveTime = 0.7f; // Duration the sprite is visually affected
+
+    // Pool for LineRenderers
+    private readonly List<LineRenderer> linePool = new List<LineRenderer>();
+    private int activeLineCount = 0;
+
     protected override void Awake()
     {
         base.Awake();
         SetStats(20f, 3.3f, 7, 0f, 1.3f, 2);
-        lineRenderer = GetComponent<LineRenderer>();
-        lineRenderer.enabled = false;
-        lineRenderer.startWidth = 0.08f; // Reduced from 0.1f to 0.05f
-        lineRenderer.endWidth = 0.05f;   // Reduced from 0.1f to 0.05f
-        lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-        lineRenderer.startColor = Color.cyan;
-        lineRenderer.endColor = Color.white;
+        // Optionally create a default prefab if not set
+        if (lineRendererPrefab == null)
+        {
+            var go = new GameObject("TeslaArcLineRenderer");
+            var lr = go.AddComponent<LineRenderer>();
+            lr.startWidth = 0.04f;
+            lr.endWidth = 0.04f;
+            lr.material = new Material(Shader.Find("Sprites/Default"));
+            lr.startColor = Color.cyan;
+            lr.endColor = Color.cyan;
+            lr.enabled = false;
+            lineRendererPrefab = go;
+            go.SetActive(false);
+        }
     }
 
     public void SetStats(float newRange, float newChainRange, int newMaxChainTargets, float newDamage, float newAttacksPerSecond, int newMaxArcsPerEnemy)
@@ -49,12 +65,12 @@ public class TeslaTower : Tower
     {
         base.Update();
 
-        if (lineRenderer.enabled)
+        if (activeLineCount > 0)
         {
             lineTimer -= Time.deltaTime;
             if (lineTimer <= 0f)
             {
-                lineRenderer.enabled = false;
+                DisableAllLines();
             }
         }
     }
@@ -63,26 +79,15 @@ public class TeslaTower : Tower
     {
         if (enemiesInRange.Count == 0)
         {
-            lineRenderer.enabled = false;
+            DisableAllLines();
             return;
         }
 
         // 1. Find the closest enemy to the tower
-        Enemy firstTarget = null;
-        float minDist = float.MaxValue;
-        foreach (var enemy in enemiesInRange)
-        {
-            float dist = Vector3.Distance(transform.position, enemy.transform.position);
-            if (dist < minDist)
-            {
-                minDist = dist;
-                firstTarget = enemy;
-            }
-        }
-
+        Enemy firstTarget = SelectTarget();
         if (firstTarget == null)
         {
-            lineRenderer.enabled = false;
+            DisableAllLines();
             return;
         }
 
@@ -100,7 +105,7 @@ public class TeslaTower : Tower
             var (current, fromPos) = queue.Dequeue();
 
             // Find up to maxArcsPerEnemy closest unhit enemies within chainRange
-            List<Enemy> nextTargets = FindClosestChainTargets(current, new List<Enemy>(hitEnemies), chainRange, maxArcsPerEnemy);
+            List<Enemy> nextTargets = FindClosestChainTargets(current, hitEnemies, chainRange, maxArcsPerEnemy);
 
             int arcsCreated = 0;
             foreach (var next in nextTargets)
@@ -109,10 +114,9 @@ public class TeslaTower : Tower
                     break;
                 if (arcsCreated >= maxArcsPerEnemy)
                     break;
-                if (!hitEnemies.Contains(next))
+                if (hitEnemies.Add(next))
                 {
                     arcs.Add((current.transform.position, next.transform.position));
-                    hitEnemies.Add(next);
                     queue.Enqueue((next, current.transform.position));
                     totalTargets++;
                     arcsCreated++;
@@ -140,31 +144,53 @@ public class TeslaTower : Tower
                 if (target is Zomboss zomboss)
                     zomboss.UpdateSpeedBasedOnColor();
 
-                ColorChangeUtility.ShowSpriteTemporarily(this, target, sr, 0.5f);
+                ColorChangeUtility.ShowSpriteTemporarily(this, target, sr, spriteActiveTime);
             }
         }
 
-        // 4. Draw all arcs as individual segments
-        if (arcs.Count > 0)
+        // 4. Draw all arcs as individual segments using pooled LineRenderers
+        EnsureLinePoolSize(arcs.Count);
+        for (int i = 0; i < arcs.Count; i++)
         {
-            lineRenderer.positionCount = arcs.Count * 2;
-            int i = 0;
-            foreach (var arc in arcs)
-            {
-                lineRenderer.SetPosition(i++, arc.from);
-                lineRenderer.SetPosition(i++, arc.to);
-            }
-            lineRenderer.enabled = true;
-            lineTimer = lineDisplayTime;
+            var lr = linePool[i];
+            lr.positionCount = 2;
+            lr.SetPosition(0, arcs[i].from);
+            lr.SetPosition(1, arcs[i].to);
+            lr.enabled = true;
         }
-        else
+        // Disable any unused lines from previous frame
+        for (int i = arcs.Count; i < activeLineCount; i++)
+            linePool[i].enabled = false;
+        activeLineCount = arcs.Count;
+        lineTimer = lineDisplayTime;
+    }
+
+    private void EnsureLinePoolSize(int needed)
+    {
+        while (linePool.Count < needed)
         {
-            lineRenderer.enabled = false;
+            var go = Instantiate(lineRendererPrefab, transform);
+            go.SetActive(true);
+            var lr = go.GetComponent<LineRenderer>();
+            lr.startWidth = 0.08f;
+            lr.endWidth = 0.05f;
+            lr.material = new Material(Shader.Find("Sprites/Default"));
+            lr.startColor = Color.cyan;
+            lr.endColor = Color.white;
+            lr.enabled = false;
+            linePool.Add(lr);
         }
     }
 
+    private void DisableAllLines()
+    {
+        for (int i = 0; i < activeLineCount; i++)
+            linePool[i].enabled = false;
+        activeLineCount = 0;
+    }
+
     // Returns up to count closest enemies to 'from', not in 'exclude', within 'maxRange'
-    private List<Enemy> FindClosestChainTargets(Enemy from, List<Enemy> exclude, float maxRange, int count)
+    private List<Enemy> FindClosestChainTargets(Enemy from, HashSet<Enemy> exclude, float maxRange, int count)
     {
         Enemy[] allEnemies = GameObject.FindObjectsOfType<Enemy>();
         List<Enemy> candidates = new List<Enemy>();
