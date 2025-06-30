@@ -26,11 +26,14 @@ public class TeslaTower : Tower
     // Track sprite coroutines per enemy to prevent overlap
     private readonly Dictionary<Enemy, Coroutine> spriteCoroutines = new Dictionary<Enemy, Coroutine>();
 
+    [SerializeField]
+    private float chainRange = 8f; // Arc/chain range between enemies, independent of tower range
+
     protected void Awake()
     {
         range = 20f;
         damage = 1f;
-        attacksPerSecond = 2f;
+        attacksPerSecond = 1.3f;
 
         lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.enabled = false;
@@ -71,48 +74,86 @@ public class TeslaTower : Tower
             return;
         }
 
-        Enemy target = SelectTarget();
-        if (target == null)
+        // 1. Find the initial target (within tower range)
+        Enemy firstTarget = SelectTarget();
+        if (firstTarget == null)
         {
             lineRenderer.enabled = false;
             return;
         }
 
-        target.TakeDamage(damage);
+        // 2. Chain to the next two closest enemies (within chainRange, from the last hit enemy)
+        List<Enemy> chainTargets = new List<Enemy> { firstTarget };
+        Enemy current = firstTarget;
 
-        // 1. Move 10% closer to yellow
-        SpriteRenderer sr = target.GetComponent<SpriteRenderer>();
-        if (sr != null)
+        for (int i = 0; i < 2; i++)
         {
-            Color current = sr.color;
-            Color yellow = Color.yellow;
-            float t = 0.1f; // 10%
-            Color newColor = Color.Lerp(current, yellow, t);
-            sr.color = newColor;
-
-            // If Zomboss, update speed based on color
-            Zomboss zomboss = target as Zomboss;
-            if (zomboss != null)
+            Enemy next = FindClosestEnemyGlobal(current, chainTargets, chainRange);
+            if (next != null)
             {
-                zomboss.UpdateSpeedBasedOnColor();
+                chainTargets.Add(next);
+                current = next;
             }
-
-            // 2. Enable sprite for 0.5s, then restore state
-            // Stop previous coroutine if running
-            if (spriteCoroutines.TryGetValue(target, out Coroutine running) && running != null)
+            else
             {
-                StopCoroutine(running);
+                break;
             }
-            Coroutine newCoroutine = StartCoroutine(ShowSpriteTemporarily(target, sr, 0.5f));
-            spriteCoroutines[target] = newCoroutine;
         }
 
-        // Draw line to target
-        lineRenderer.positionCount = 2;
-        lineRenderer.SetPosition(0, transform.position);
-        lineRenderer.SetPosition(1, target.transform.position);
+        // 3. Apply effects and draw lines
+        List<Vector3> linePoints = new List<Vector3> { transform.position };
+        foreach (Enemy target in chainTargets)
+        {
+            if (target == null) continue;
+
+            target.TakeDamage(damage);
+
+            // Move 10% closer to yellow
+            SpriteRenderer sr = target.GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                Color currentColor = sr.color;
+                Color yellow = Color.yellow;
+                sr.color = Color.Lerp(currentColor, yellow, 0.1f);
+
+                // If Zomboss, update speed based on color
+                if (target is Zomboss zomboss)
+                    zomboss.UpdateSpeedBasedOnColor();
+
+                // Sprite flash logic (as before)
+                if (spriteCoroutines.TryGetValue(target, out Coroutine running) && running != null)
+                    StopCoroutine(running);
+                Coroutine newCoroutine = StartCoroutine(ShowSpriteTemporarily(target, sr, 0.5f));
+                spriteCoroutines[target] = newCoroutine;
+            }
+
+            linePoints.Add(target.transform.position);
+        }
+
+        // Draw the chain line
+        lineRenderer.positionCount = linePoints.Count;
+        lineRenderer.SetPositions(linePoints.ToArray());
         lineRenderer.enabled = true;
         lineTimer = lineDisplayTime;
+    }
+
+    // Helper: Find the closest enemy to 'from', not in 'exclude', within 'maxRange', searching all enemies in the scene
+    private Enemy FindClosestEnemyGlobal(Enemy from, List<Enemy> exclude, float maxRange)
+    {
+        Enemy[] allEnemies = GameObject.FindObjectsOfType<Enemy>();
+        Enemy closest = null;
+        float minDist = float.MaxValue;
+        foreach (var enemy in allEnemies)
+        {
+            if (enemy == null || exclude.Contains(enemy)) continue;
+            float dist = Vector3.Distance(from.transform.position, enemy.transform.position);
+            if (dist < minDist && dist <= maxRange)
+            {
+                minDist = dist;
+                closest = enemy;
+            }
+        }
+        return closest;
     }
 
     // Coroutine to enable sprite for a short time, then restore state
