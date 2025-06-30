@@ -7,7 +7,7 @@ public class TeslaTower : Tower
 {
     [SerializeField]
     private LineRenderer lineRenderer;
-    private float lineDisplayTime = 0.1f;
+    private float lineDisplayTime = .05f;
     private float lineTimer = 0f;
 
     [SerializeField]
@@ -22,11 +22,11 @@ public class TeslaTower : Tower
     protected override void Awake()
     {
         base.Awake();
-        SetStats(20f, 3.3f, 7, 1f, 1.3f, 2);
+        SetStats(20f, 3.3f, 7, 0f, 1.3f, 2);
         lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.enabled = false;
-        lineRenderer.startWidth = 0.1f;
-        lineRenderer.endWidth = 0.1f;
+        lineRenderer.startWidth = 0.08f; // Reduced from 0.1f to 0.05f
+        lineRenderer.endWidth = 0.05f;   // Reduced from 0.1f to 0.05f
         lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
         lineRenderer.startColor = Color.cyan;
         lineRenderer.endColor = Color.white;
@@ -67,46 +67,66 @@ public class TeslaTower : Tower
             return;
         }
 
-        Enemy firstTarget = SelectTarget();
+        // 1. Find the closest enemy to the tower
+        Enemy firstTarget = null;
+        float minDist = float.MaxValue;
+        foreach (var enemy in enemiesInRange)
+        {
+            float dist = Vector3.Distance(transform.position, enemy.transform.position);
+            if (dist < minDist)
+            {
+                minDist = dist;
+                firstTarget = enemy;
+            }
+        }
+
         if (firstTarget == null)
         {
             lineRenderer.enabled = false;
             return;
         }
 
-        // Map to track each enemy's parent (for line rendering)
-        Dictionary<Enemy, Vector3> parentMap = new Dictionary<Enemy, Vector3>();
-        List<Enemy> hitEnemies = new List<Enemy> { firstTarget };
-        Queue<Enemy> queue = new Queue<Enemy>();
-        queue.Enqueue(firstTarget);
+        // 2. Chain logic: BFS from firstTarget, up to maxChainTargets, maxArcsPerEnemy per node
+        var hitEnemies = new HashSet<Enemy>();
+        var arcs = new List<(Vector3 from, Vector3 to)>();
+        var queue = new Queue<(Enemy enemy, Vector3 fromPos)>();
 
-        // The first arc is from the tower to the first target
-        parentMap[firstTarget] = transform.position;
+        hitEnemies.Add(firstTarget);
+        queue.Enqueue((firstTarget, transform.position));
+        int totalTargets = 1;
 
-        while (queue.Count > 0 && hitEnemies.Count < maxChainTargets)
+        while (queue.Count > 0 && totalTargets < maxChainTargets)
         {
-            Enemy current = queue.Dequeue();
-            List<Enemy> nextTargets = FindClosestChainTargets(current, hitEnemies, chainRange, maxArcsPerEnemy);
+            var (current, fromPos) = queue.Dequeue();
 
+            // Find up to maxArcsPerEnemy closest unhit enemies within chainRange
+            List<Enemy> nextTargets = FindClosestChainTargets(current, new List<Enemy>(hitEnemies), chainRange, maxArcsPerEnemy);
+
+            int arcsCreated = 0;
             foreach (var next in nextTargets)
             {
-                if (hitEnemies.Count >= maxChainTargets)
+                if (totalTargets >= maxChainTargets)
                     break;
-
-                hitEnemies.Add(next);
-                queue.Enqueue(next);
-
-                // The parent of this enemy is the current enemy
-                parentMap[next] = current.transform.position;
+                if (arcsCreated >= maxArcsPerEnemy)
+                    break;
+                if (!hitEnemies.Contains(next))
+                {
+                    arcs.Add((current.transform.position, next.transform.position));
+                    hitEnemies.Add(next);
+                    queue.Enqueue((next, current.transform.position));
+                    totalTargets++;
+                    arcsCreated++;
+                }
             }
         }
 
-        // Apply effects to all hit enemies
-        HashSet<Enemy> alreadyProcessed = new HashSet<Enemy>();
+        // Add the initial arc from the tower to the first target
+        arcs.Insert(0, (transform.position, firstTarget.transform.position));
+
+        // 3. Apply effects to all hit enemies
         foreach (Enemy target in hitEnemies)
         {
-            if (target == null || alreadyProcessed.Contains(target)) continue;
-            alreadyProcessed.Add(target);
+            if (target == null) continue;
 
             target.TakeDamage(damage);
 
@@ -124,15 +144,15 @@ public class TeslaTower : Tower
             }
         }
 
-        // Draw the chain lines (one segment per arc, from parent to child)
-        if (parentMap.Count > 0)
+        // 4. Draw all arcs as individual segments
+        if (arcs.Count > 0)
         {
-            lineRenderer.positionCount = parentMap.Count * 2;
+            lineRenderer.positionCount = arcs.Count * 2;
             int i = 0;
-            foreach (var kvp in parentMap)
+            foreach (var arc in arcs)
             {
-                lineRenderer.SetPosition(i++, kvp.Value); // parent position
-                lineRenderer.SetPosition(i++, kvp.Key.transform.position); // child position
+                lineRenderer.SetPosition(i++, arc.from);
+                lineRenderer.SetPosition(i++, arc.to);
             }
             lineRenderer.enabled = true;
             lineTimer = lineDisplayTime;
