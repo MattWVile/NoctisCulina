@@ -5,39 +5,21 @@ using System.Collections;
 [RequireComponent(typeof(LineRenderer))]
 public class TeslaTower : Tower
 {
-    public enum TargetingMode
-    {
-        Closest,
-        MostHealth,
-        LeastHealth
-    }
-
     [SerializeField]
-    private TargetingMode targetingMode = TargetingMode.Closest;
-
     private LineRenderer lineRenderer;
     private float lineDisplayTime = 0.1f;
     private float lineTimer = 0f;
 
-    [SerializeField] private RangeController rangeIndicator;
-
-    private readonly List<Enemy> enemiesInRange = new List<Enemy>();
-
-    // Track sprite coroutines per enemy to prevent overlap
-    private readonly Dictionary<Enemy, Coroutine> spriteCoroutines = new Dictionary<Enemy, Coroutine>();
+    [SerializeField]
+    private float chainRange; // Arc/chain range between enemies, independent of tower range
 
     [SerializeField]
-    private float chainRange = 8f; // Arc/chain range between enemies, independent of tower range
+    private int maxChainTargets; // Total number of enemies the arc can hit (including the first)
 
-    [SerializeField]
-    private int maxChainTargets = 3; // Total number of enemies the arc can hit (including the first)
-
-    protected void Awake()
+    protected override void Awake()
     {
-
-        if (rangeIndicator == null)
-            rangeIndicator = GetComponentInChildren<RangeController>();
-        SetStats(20f, 8f, 3, 1f, 1.3f); 
+        base.Awake();
+        SetStats(20f, 3.3f, 3, 1f, 1.3f);
         lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.enabled = false;
         lineRenderer.startWidth = 0.1f;
@@ -45,9 +27,6 @@ public class TeslaTower : Tower
         lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
         lineRenderer.startColor = Color.cyan;
         lineRenderer.endColor = Color.white;
-
-        if (rangeIndicator != null)
-            rangeIndicator.SetRange(towerRange);
     }
 
     public void SetStats(float newRange, float newChainRange, int newMaxChainTargets, float newDamage, float newAttacksPerSecond)
@@ -74,9 +53,6 @@ public class TeslaTower : Tower
                 lineRenderer.enabled = false;
             }
         }
-
-        if (rangeIndicator != null)
-            rangeIndicator.SetRange(towerRange);
     }
 
     protected override void TryAttack()
@@ -129,15 +105,10 @@ public class TeslaTower : Tower
                 Color yellow = Color.yellow;
                 sr.color = Color.Lerp(currentColor, yellow, 0.1f);
 
-                // If Zomboss, update speed based on color
                 if (target is Zomboss zomboss)
                     zomboss.UpdateSpeedBasedOnColor();
 
-                // Sprite flash logic (as before)
-                if (spriteCoroutines.TryGetValue(target, out Coroutine running) && running != null)
-                    StopCoroutine(running);
-                Coroutine newCoroutine = StartCoroutine(ShowSpriteTemporarily(target, sr, 0.5f));
-                spriteCoroutines[target] = newCoroutine;
+                ColorChangeUtility.ShowSpriteTemporarily(this, target, sr, 0.5f);
             }
 
             linePoints.Add(target.transform.position);
@@ -150,7 +121,6 @@ public class TeslaTower : Tower
         lineTimer = lineDisplayTime;
     }
 
-    // Helper: Find the closest enemy to 'from', not in 'exclude', within 'maxRange', searching all enemies in the scene
     private Enemy FindClosestChainTarget(Enemy from, List<Enemy> exclude, float maxRange)
     {
         Enemy[] allEnemies = GameObject.FindObjectsOfType<Enemy>();
@@ -167,87 +137,5 @@ public class TeslaTower : Tower
             }
         }
         return closest;
-    }
-
-    // Coroutine to enable sprite for a short time, then restore state
-    private IEnumerator ShowSpriteTemporarily(Enemy enemy, SpriteRenderer sr, float duration)
-    {
-        sr.enabled = true;
-        yield return new WaitForSeconds(duration);
-        if (enemy != null)
-            enemy.UpdateSpriteRendererState();
-        spriteCoroutines.Remove(enemy);
-    }
-
-    private Enemy SelectTarget()
-    {
-        Enemy selected = null;
-        switch (targetingMode)
-        {
-            case TargetingMode.Closest:
-                float minDist = float.MaxValue;
-                foreach (var enemy in enemiesInRange)
-                {
-                    if (enemy == null) continue;
-                    float dist = Vector3.Distance(transform.position, enemy.transform.position);
-                    if (dist < minDist)
-                    {
-                        minDist = dist;
-                        selected = enemy;
-                    }
-                }
-                break;
-            case TargetingMode.MostHealth:
-                float maxHealth = float.MinValue;
-                foreach (var enemy in enemiesInRange)
-                {
-                    if (enemy == null) continue;
-                    if (enemy.CurrentHealth > maxHealth)
-                    {
-                        maxHealth = enemy.CurrentHealth;
-                        selected = enemy;
-                    }
-                }
-                break;
-            case TargetingMode.LeastHealth:
-                float minHealth = float.MaxValue;
-                foreach (var enemy in enemiesInRange)
-                {
-                    if (enemy == null) continue;
-                    if (enemy.CurrentHealth < minHealth)
-                    {
-                        minHealth = enemy.CurrentHealth;
-                        selected = enemy;
-                    }
-                }
-                break;
-        }
-        return selected;
-    }
-
-    // Call this from UI or player input to change targeting mode
-    public void SetTargetingMode(TargetingMode mode)
-    {
-        targetingMode = mode;
-    }
-
-    // Called by RangeIndicator
-    public void OnRangeTriggerEnter(Collider2D other)
-    {
-        Enemy enemy = other.GetComponent<Enemy>();
-        if (enemy != null && !enemiesInRange.Contains(enemy))
-        {
-            enemiesInRange.Add(enemy);
-        }
-    }
-
-    // Called by RangeIndicator
-    public void OnRangeTriggerExit(Collider2D other)
-    {
-        Enemy enemy = other.GetComponent<Enemy>();
-        if (enemy != null)
-        {
-            enemiesInRange.Remove(enemy);
-        }
     }
 }
