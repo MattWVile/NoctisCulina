@@ -1,9 +1,20 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 [RequireComponent(typeof(LineRenderer))]
 public class TeslaTower : Tower
 {
+    public enum TargetingMode
+    {
+        Closest,
+        MostHealth,
+        LeastHealth
+    }
+
+    [SerializeField]
+    private TargetingMode targetingMode = TargetingMode.Closest;
+
     private LineRenderer lineRenderer;
     private float lineDisplayTime = 0.1f;
     private float lineTimer = 0f;
@@ -12,11 +23,14 @@ public class TeslaTower : Tower
 
     private readonly List<Enemy> enemiesInRange = new List<Enemy>();
 
+    // Track sprite coroutines per enemy to prevent overlap
+    private readonly Dictionary<Enemy, Coroutine> spriteCoroutines = new Dictionary<Enemy, Coroutine>();
+
     protected void Awake()
     {
         range = 20f;
         damage = 1f;
-        fireRate = 5f;
+        attacksPerSecond = 2f;
 
         lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.enabled = false;
@@ -57,28 +71,110 @@ public class TeslaTower : Tower
             return;
         }
 
-        List<Vector3> linePoints = new List<Vector3> { transform.position };
-        foreach (var enemy in enemiesInRange)
-        {
-            if (enemy != null)
-            {
-                enemy.TakeDamage(damage);
-                linePoints.Add(enemy.transform.position);
-                linePoints.Add(transform.position);
-            }
-        }
-
-        if (linePoints.Count > 1)
-        {
-            lineRenderer.positionCount = linePoints.Count;
-            lineRenderer.SetPositions(linePoints.ToArray());
-            lineRenderer.enabled = true;
-            lineTimer = lineDisplayTime;
-        }
-        else
+        Enemy target = SelectTarget();
+        if (target == null)
         {
             lineRenderer.enabled = false;
+            return;
         }
+
+        target.TakeDamage(damage);
+
+        // 1. Move 10% closer to yellow
+        SpriteRenderer sr = target.GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            Color current = sr.color;
+            Color yellow = Color.yellow;
+            float t = 0.1f; // 10%
+            Color newColor = Color.Lerp(current, yellow, t);
+            sr.color = newColor;
+
+            // If Zomboss, update speed based on color
+            Zomboss zomboss = target as Zomboss;
+            if (zomboss != null)
+            {
+                zomboss.UpdateSpeedBasedOnColor();
+            }
+
+            // 2. Enable sprite for 0.5s, then restore state
+            // Stop previous coroutine if running
+            if (spriteCoroutines.TryGetValue(target, out Coroutine running) && running != null)
+            {
+                StopCoroutine(running);
+            }
+            Coroutine newCoroutine = StartCoroutine(ShowSpriteTemporarily(target, sr, 0.5f));
+            spriteCoroutines[target] = newCoroutine;
+        }
+
+        // Draw line to target
+        lineRenderer.positionCount = 2;
+        lineRenderer.SetPosition(0, transform.position);
+        lineRenderer.SetPosition(1, target.transform.position);
+        lineRenderer.enabled = true;
+        lineTimer = lineDisplayTime;
+    }
+
+    // Coroutine to enable sprite for a short time, then restore state
+    private IEnumerator ShowSpriteTemporarily(Enemy enemy, SpriteRenderer sr, float duration)
+    {
+        sr.enabled = true;
+        yield return new WaitForSeconds(duration);
+        if (enemy != null)
+            enemy.UpdateSpriteRendererState();
+        spriteCoroutines.Remove(enemy);
+    }
+
+    private Enemy SelectTarget()
+    {
+        Enemy selected = null;
+        switch (targetingMode)
+        {
+            case TargetingMode.Closest:
+                float minDist = float.MaxValue;
+                foreach (var enemy in enemiesInRange)
+                {
+                    if (enemy == null) continue;
+                    float dist = Vector3.Distance(transform.position, enemy.transform.position);
+                    if (dist < minDist)
+                    {
+                        minDist = dist;
+                        selected = enemy;
+                    }
+                }
+                break;
+            case TargetingMode.MostHealth:
+                float maxHealth = float.MinValue;
+                foreach (var enemy in enemiesInRange)
+                {
+                    if (enemy == null) continue;
+                    if (enemy.CurrentHealth > maxHealth)
+                    {
+                        maxHealth = enemy.CurrentHealth;
+                        selected = enemy;
+                    }
+                }
+                break;
+            case TargetingMode.LeastHealth:
+                float minHealth = float.MaxValue;
+                foreach (var enemy in enemiesInRange)
+                {
+                    if (enemy == null) continue;
+                    if (enemy.CurrentHealth < minHealth)
+                    {
+                        minHealth = enemy.CurrentHealth;
+                        selected = enemy;
+                    }
+                }
+                break;
+        }
+        return selected;
+    }
+
+    // Call this from UI or player input to change targeting mode
+    public void SetTargetingMode(TargetingMode mode)
+    {
+        targetingMode = mode;
     }
 
     // Called by RangeIndicator

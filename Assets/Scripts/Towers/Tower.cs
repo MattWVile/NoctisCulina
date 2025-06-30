@@ -5,21 +5,21 @@ public abstract class Tower : MonoBehaviour
     [Header("Tower Stats")]
     [SerializeField] protected float range = 5f;
     [SerializeField] protected float damage = 10f;
-    [SerializeField] protected float fireRate = 1f; // shots per second
+    [SerializeField] protected float attacksPerSecond = 1f; // attacks per second
 
     public float Range => range;
     public float Damage => damage;
-    public float FireRate => fireRate;
+    public float AttacksPerSecond => attacksPerSecond;
 
-    protected float fireCooldown = 0f;
+    protected float attackCooldown = 0f;
 
     protected virtual void Update()
     {
-        fireCooldown -= Time.deltaTime;
-        if (fireCooldown <= 0f)
+        attackCooldown -= Time.deltaTime;
+        if (attackCooldown <= 0f)
         {
             TryAttack();
-            fireCooldown = 1f / fireRate;
+            attackCooldown = 1f / attacksPerSecond;
         }
     }
 

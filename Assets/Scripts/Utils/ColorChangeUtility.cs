@@ -106,4 +106,19 @@ public static class ColorChangeUtility
 
         onComplete?.Invoke(); // Call the completion callback if provided
     }
+    public static void ShowSpriteTemporarily(MonoBehaviour caller, Enemy enemy, SpriteRenderer sr, float duration)
+    {
+        if (caller != null && enemy != null && sr != null)
+        {
+            caller.StartCoroutine(ShowSpriteTemporarilyCoroutine(enemy, sr, duration));
+        }
+    }
+
+    private static IEnumerator ShowSpriteTemporarilyCoroutine(Enemy enemy, SpriteRenderer sr, float duration)
+    {
+        sr.enabled = true;
+        yield return new WaitForSeconds(duration);
+        if (enemy != null)
+            enemy.UpdateSpriteRendererState();
+    }
 }
