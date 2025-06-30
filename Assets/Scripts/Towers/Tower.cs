@@ -3,11 +3,11 @@ using UnityEngine;
 public abstract class Tower : MonoBehaviour
 {
     [Header("Tower Stats")]
-    [SerializeField] protected float range = 5f;
+    [SerializeField] protected float towerRange = 5f;
     [SerializeField] protected float damage = 10f;
     [SerializeField] protected float attacksPerSecond = 1f; // attacks per second
 
-    public float Range => range;
+    public float Range => towerRange;
     public float Damage => damage;
     public float AttacksPerSecond => attacksPerSecond;
 
@@ -35,7 +35,7 @@ public abstract class Tower : MonoBehaviour
         foreach (var enemy in enemies)
         {
             float dist = Vector3.Distance(transform.position, enemy.transform.position);
-            if (dist <= range && dist < minDist)
+            if (dist <= towerRange && dist < minDist)
             {
                 minDist = dist;
                 nearest = enemy.transform;

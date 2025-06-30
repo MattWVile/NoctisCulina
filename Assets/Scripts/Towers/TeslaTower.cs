@@ -29,12 +29,15 @@ public class TeslaTower : Tower
     [SerializeField]
     private float chainRange = 8f; // Arc/chain range between enemies, independent of tower range
 
+    [SerializeField]
+    private int maxChainTargets = 3; // Total number of enemies the arc can hit (including the first)
+
     protected void Awake()
     {
-        range = 20f;
-        damage = 1f;
-        attacksPerSecond = 1.3f;
 
+        if (rangeIndicator == null)
+            rangeIndicator = GetComponentInChildren<RangeController>();
+        SetStats(20f, 8f, 3, 1f, 1.3f); 
         lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.enabled = false;
         lineRenderer.startWidth = 0.1f;
@@ -43,10 +46,20 @@ public class TeslaTower : Tower
         lineRenderer.startColor = Color.cyan;
         lineRenderer.endColor = Color.white;
 
-        if (rangeIndicator == null)
-            rangeIndicator = GetComponentInChildren<RangeController>();
         if (rangeIndicator != null)
-            rangeIndicator.SetRange(range);
+            rangeIndicator.SetRange(towerRange);
+    }
+
+    public void SetStats(float newRange, float newChainRange, int newMaxChainTargets, float newDamage, float newAttacksPerSecond)
+    {
+        towerRange = newRange;
+        chainRange = newChainRange;
+        maxChainTargets = Mathf.Max(1, newMaxChainTargets);
+        damage = newDamage;
+        attacksPerSecond = newAttacksPerSecond;
+
+        if (rangeIndicator != null)
+            rangeIndicator.SetRange(towerRange);
     }
 
     protected override void Update()
@@ -63,7 +76,7 @@ public class TeslaTower : Tower
         }
 
         if (rangeIndicator != null)
-            rangeIndicator.SetRange(range);
+            rangeIndicator.SetRange(towerRange);
     }
 
     protected override void TryAttack()
@@ -82,13 +95,13 @@ public class TeslaTower : Tower
             return;
         }
 
-        // 2. Chain to the next two closest enemies (within chainRange, from the last hit enemy)
+        // 2. Chain to the next closest enemies (within chainRange, from the last hit enemy)
         List<Enemy> chainTargets = new List<Enemy> { firstTarget };
         Enemy current = firstTarget;
 
-        for (int i = 0; i < 2; i++)
+        for (int i = 1; i < maxChainTargets; i++)
         {
-            Enemy next = FindClosestEnemyGlobal(current, chainTargets, chainRange);
+            Enemy next = FindClosestChainTarget(current, chainTargets, chainRange);
             if (next != null)
             {
                 chainTargets.Add(next);
@@ -138,7 +151,7 @@ public class TeslaTower : Tower
     }
 
     // Helper: Find the closest enemy to 'from', not in 'exclude', within 'maxRange', searching all enemies in the scene
-    private Enemy FindClosestEnemyGlobal(Enemy from, List<Enemy> exclude, float maxRange)
+    private Enemy FindClosestChainTarget(Enemy from, List<Enemy> exclude, float maxRange)
     {
         Enemy[] allEnemies = GameObject.FindObjectsOfType<Enemy>();
         Enemy closest = null;
