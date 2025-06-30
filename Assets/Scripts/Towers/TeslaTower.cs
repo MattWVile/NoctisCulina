@@ -16,10 +16,13 @@ public class TeslaTower : Tower
     [SerializeField]
     private int maxChainTargets; // Total number of enemies the arc can hit (including the first)
 
+    [SerializeField]
+    private int maxArcsPerEnemy; // How many arcs branch from each hit enemy
+
     protected override void Awake()
     {
         base.Awake();
-        SetStats(20f, 3.3f, 3, 1f, 1.3f);
+        SetStats(20f, 3.3f, 7, 1f, 1.3f, 2);
         lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.enabled = false;
         lineRenderer.startWidth = 0.1f;
@@ -29,13 +32,14 @@ public class TeslaTower : Tower
         lineRenderer.endColor = Color.white;
     }
 
-    public void SetStats(float newRange, float newChainRange, int newMaxChainTargets, float newDamage, float newAttacksPerSecond)
+    public void SetStats(float newRange, float newChainRange, int newMaxChainTargets, float newDamage, float newAttacksPerSecond, int newMaxArcsPerEnemy)
     {
         towerRange = newRange;
         chainRange = newChainRange;
         maxChainTargets = Mathf.Max(1, newMaxChainTargets);
         damage = newDamage;
         attacksPerSecond = newAttacksPerSecond;
+        maxArcsPerEnemy = Mathf.Max(1, newMaxArcsPerEnemy);
 
         if (rangeIndicator != null)
             rangeIndicator.SetRange(towerRange);
@@ -63,7 +67,6 @@ public class TeslaTower : Tower
             return;
         }
 
-        // 1. Find the initial target (within tower range)
         Enemy firstTarget = SelectTarget();
         if (firstTarget == null)
         {
@@ -71,33 +74,42 @@ public class TeslaTower : Tower
             return;
         }
 
-        // 2. Chain to the next closest enemies (within chainRange, from the last hit enemy)
-        List<Enemy> chainTargets = new List<Enemy> { firstTarget };
-        Enemy current = firstTarget;
+        // Map to track each enemy's parent (for line rendering)
+        Dictionary<Enemy, Vector3> parentMap = new Dictionary<Enemy, Vector3>();
+        List<Enemy> hitEnemies = new List<Enemy> { firstTarget };
+        Queue<Enemy> queue = new Queue<Enemy>();
+        queue.Enqueue(firstTarget);
 
-        for (int i = 1; i < maxChainTargets; i++)
+        // The first arc is from the tower to the first target
+        parentMap[firstTarget] = transform.position;
+
+        while (queue.Count > 0 && hitEnemies.Count < maxChainTargets)
         {
-            Enemy next = FindClosestChainTarget(current, chainTargets, chainRange);
-            if (next != null)
+            Enemy current = queue.Dequeue();
+            List<Enemy> nextTargets = FindClosestChainTargets(current, hitEnemies, chainRange, maxArcsPerEnemy);
+
+            foreach (var next in nextTargets)
             {
-                chainTargets.Add(next);
-                current = next;
-            }
-            else
-            {
-                break;
+                if (hitEnemies.Count >= maxChainTargets)
+                    break;
+
+                hitEnemies.Add(next);
+                queue.Enqueue(next);
+
+                // The parent of this enemy is the current enemy
+                parentMap[next] = current.transform.position;
             }
         }
 
-        // 3. Apply effects and draw lines
-        List<Vector3> linePoints = new List<Vector3> { transform.position };
-        foreach (Enemy target in chainTargets)
+        // Apply effects to all hit enemies
+        HashSet<Enemy> alreadyProcessed = new HashSet<Enemy>();
+        foreach (Enemy target in hitEnemies)
         {
-            if (target == null) continue;
+            if (target == null || alreadyProcessed.Contains(target)) continue;
+            alreadyProcessed.Add(target);
 
             target.TakeDamage(damage);
 
-            // Move 10% closer to yellow
             SpriteRenderer sr = target.GetComponent<SpriteRenderer>();
             if (sr != null)
             {
@@ -110,32 +122,48 @@ public class TeslaTower : Tower
 
                 ColorChangeUtility.ShowSpriteTemporarily(this, target, sr, 0.5f);
             }
-
-            linePoints.Add(target.transform.position);
         }
 
-        // Draw the chain line
-        lineRenderer.positionCount = linePoints.Count;
-        lineRenderer.SetPositions(linePoints.ToArray());
-        lineRenderer.enabled = true;
-        lineTimer = lineDisplayTime;
+        // Draw the chain lines (one segment per arc, from parent to child)
+        if (parentMap.Count > 0)
+        {
+            lineRenderer.positionCount = parentMap.Count * 2;
+            int i = 0;
+            foreach (var kvp in parentMap)
+            {
+                lineRenderer.SetPosition(i++, kvp.Value); // parent position
+                lineRenderer.SetPosition(i++, kvp.Key.transform.position); // child position
+            }
+            lineRenderer.enabled = true;
+            lineTimer = lineDisplayTime;
+        }
+        else
+        {
+            lineRenderer.enabled = false;
+        }
     }
 
-    private Enemy FindClosestChainTarget(Enemy from, List<Enemy> exclude, float maxRange)
+    // Returns up to count closest enemies to 'from', not in 'exclude', within 'maxRange'
+    private List<Enemy> FindClosestChainTargets(Enemy from, List<Enemy> exclude, float maxRange, int count)
     {
         Enemy[] allEnemies = GameObject.FindObjectsOfType<Enemy>();
-        Enemy closest = null;
-        float minDist = float.MaxValue;
+        List<Enemy> candidates = new List<Enemy>();
         foreach (var enemy in allEnemies)
         {
             if (enemy == null || exclude.Contains(enemy)) continue;
             float dist = Vector3.Distance(from.transform.position, enemy.transform.position);
-            if (dist < minDist && dist <= maxRange)
+            if (dist <= maxRange)
             {
-                minDist = dist;
-                closest = enemy;
+                candidates.Add(enemy);
             }
         }
-        return closest;
+        // Sort by distance
+        candidates.Sort((a, b) =>
+            Vector3.Distance(from.transform.position, a.transform.position)
+            .CompareTo(Vector3.Distance(from.transform.position, b.transform.position)));
+        // Take up to 'count'
+        if (candidates.Count > count)
+            candidates.RemoveRange(count, candidates.Count - count);
+        return candidates;
     }
 }
