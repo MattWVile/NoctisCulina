@@ -116,6 +116,10 @@ public class GameManager : MonoBehaviour
         {
             startScreenUI.SetActive(false);
         }
+        if (PauseScreenUI != null)
+        {
+            PauseScreenUI.SetActive(false);
+        }
         EnableGameUI(true);
     }
 
