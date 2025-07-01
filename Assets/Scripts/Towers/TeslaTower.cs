@@ -31,7 +31,7 @@ public class TeslaTower : Tower
     protected override void Awake()
     {
         base.Awake();
-        SetStats(20f, 3.3f, 7, 0f, 1.3f, 2);
+        SetStats(20f, 3.3f, 7, 1f, 1.3f, 2);
         // Optionally create a default prefab if not set
         if (lineRendererPrefab == null)
         {

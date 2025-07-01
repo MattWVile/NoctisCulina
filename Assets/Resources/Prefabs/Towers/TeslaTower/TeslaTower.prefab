@@ -273,8 +273,8 @@ LineRenderer:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0
-        value: 1
+        time: 0.5
+        value: 0.07727432
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -337,7 +337,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a17ec120f091154f8adf7404db4da8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  range: 20
-  damage: 10
-  fireRate: 1
+  towerRange: 20
+  damage: 1
+  attacksPerSecond: 1.2
+  targetingMode: 0
   rangeIndicator: {fileID: 0}
+  lineRendererPrefab: {fileID: 0}
+  lineDisplayTime: 0.08
+  chainRange: 0
+  maxChainTargets: 0
+  maxArcsPerEnemy: 0
+  spriteActiveTime: 0.5
