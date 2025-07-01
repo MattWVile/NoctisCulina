@@ -31,7 +31,7 @@ public class TeslaTower : Tower
     protected override void Awake()
     {
         base.Awake();
-        SetStats(20f, 3.3f, 7, 1f, 1.3f, 2);
+        SetStats(20f, 3.3f, 7, 0f, 1.3f, 2);
         // Optionally create a default prefab if not set
         if (lineRendererPrefab == null)
         {
@@ -141,6 +141,12 @@ public class TeslaTower : Tower
                 Color yellow = Color.yellow;
                 sr.color = Color.Lerp(currentColor, yellow, 0.1f);
 
+                // If the color is close enough to yellow, mark as fully changed
+                if (ApproximatelyYellow(sr.color))
+                {
+                    target.MarkColorAsFullyChanged();
+                }
+
                 if (target is Zomboss zomboss)
                     zomboss.UpdateSpeedBasedOnColor();
 
@@ -211,5 +217,15 @@ public class TeslaTower : Tower
         if (candidates.Count > count)
             candidates.RemoveRange(count, candidates.Count - count);
         return candidates;
+    }
+
+    // Helper method to check if a color is close to yellow
+    private bool ApproximatelyYellow(Color color)
+    {
+        Color yellow = Color.yellow;
+        float threshold = 0.1f;
+        return Mathf.Abs(color.r - yellow.r) < threshold &&
+               Mathf.Abs(color.g - yellow.g) < threshold &&
+               Mathf.Abs(color.b - yellow.b) < threshold;
     }
 }
