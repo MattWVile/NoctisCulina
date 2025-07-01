@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public static class ColorChangeUtility
 {
@@ -105,5 +106,31 @@ public static class ColorChangeUtility
         }
 
         onComplete?.Invoke(); // Call the completion callback if provided
+    }
+
+    // Track running coroutines per enemy to prevent overlap
+    private static readonly Dictionary<Enemy, Coroutine> spriteCoroutines = new Dictionary<Enemy, Coroutine>();
+
+    public static void ShowSpriteTemporarily(MonoBehaviour caller, Enemy enemy, SpriteRenderer sr, float duration)
+    {
+        if (caller == null || enemy == null || sr == null)
+            return;
+
+        // Stop previous coroutine if running
+        if (spriteCoroutines.TryGetValue(enemy, out Coroutine running) && running != null)
+        {
+            caller.StopCoroutine(running);
+        }
+        Coroutine newCoroutine = caller.StartCoroutine(ShowSpriteTemporarilyCoroutine(enemy, sr, duration));
+        spriteCoroutines[enemy] = newCoroutine;
+    }
+
+    private static IEnumerator ShowSpriteTemporarilyCoroutine(Enemy enemy, SpriteRenderer sr, float duration)
+    {
+        sr.enabled = true;
+        yield return new WaitForSeconds(duration);
+        if (enemy != null)
+            enemy.UpdateSpriteRendererState();
+        spriteCoroutines.Remove(enemy);
     }
 }

@@ -4,100 +4,212 @@ using System.Collections.Generic;
 [RequireComponent(typeof(LineRenderer))]
 public class TeslaTower : Tower
 {
-    private LineRenderer lineRenderer;
-    private float lineDisplayTime = 0.1f;
+    [SerializeField]
+    private GameObject lineRendererPrefab; // Assign a prefab with a LineRenderer in the inspector
+
+    [SerializeField]
+    private float lineDisplayTime = 0.08f;
     private float lineTimer = 0f;
 
-    [SerializeField] private RangeController rangeIndicator;
+    [SerializeField]
+    private float chainRange; // Arc/chain range between enemies, independent of tower range
 
-    private readonly List<Enemy> enemiesInRange = new List<Enemy>();
+    [SerializeField]
+    private int maxChainTargets; // Total number of enemies the arc can hit (including the first)
 
-    protected void Awake()
+    [SerializeField]
+    private int maxArcsPerEnemy; // How many arcs branch from each hit enemy
+
+    [Header("Tesla Visuals")]
+    [SerializeField]
+    private float spriteActiveTime = 0.7f; // Duration the sprite is visually affected
+
+    // Pool for LineRenderers
+    private readonly List<LineRenderer> linePool = new List<LineRenderer>();
+    private int activeLineCount = 0;
+
+    protected override void Awake()
     {
-        range = 20f;
-        damage = 1f;
-        fireRate = 5f;
+        base.Awake();
+        SetStats(20f, 3.3f, 7, 0f, 1.3f, 2);
+        // Optionally create a default prefab if not set
+        if (lineRendererPrefab == null)
+        {
+            var go = new GameObject("TeslaArcLineRenderer");
+            var lr = go.AddComponent<LineRenderer>();
+            lr.startWidth = 0.04f;
+            lr.endWidth = 0.04f;
+            lr.material = new Material(Shader.Find("Sprites/Default"));
+            lr.startColor = Color.cyan;
+            lr.endColor = Color.cyan;
+            lr.enabled = false;
+            lineRendererPrefab = go;
+            go.SetActive(false);
+        }
+    }
 
-        lineRenderer = GetComponent<LineRenderer>();
-        lineRenderer.enabled = false;
-        lineRenderer.startWidth = 0.1f;
-        lineRenderer.endWidth = 0.1f;
-        lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-        lineRenderer.startColor = Color.cyan;
-        lineRenderer.endColor = Color.white;
+    public void SetStats(float newRange, float newChainRange, int newMaxChainTargets, float newDamage, float newAttacksPerSecond, int newMaxArcsPerEnemy)
+    {
+        towerRange = newRange;
+        chainRange = newChainRange;
+        maxChainTargets = Mathf.Max(1, newMaxChainTargets);
+        damage = newDamage;
+        attacksPerSecond = newAttacksPerSecond;
+        maxArcsPerEnemy = Mathf.Max(1, newMaxArcsPerEnemy);
 
-        if (rangeIndicator == null)
-            rangeIndicator = GetComponentInChildren<RangeController>();
         if (rangeIndicator != null)
-            rangeIndicator.SetRange(range);
+            rangeIndicator.SetRange(towerRange);
     }
 
     protected override void Update()
     {
         base.Update();
 
-        if (lineRenderer.enabled)
+        if (activeLineCount > 0)
         {
             lineTimer -= Time.deltaTime;
             if (lineTimer <= 0f)
             {
-                lineRenderer.enabled = false;
+                DisableAllLines();
             }
         }
-
-        if (rangeIndicator != null)
-            rangeIndicator.SetRange(range);
     }
 
     protected override void TryAttack()
     {
         if (enemiesInRange.Count == 0)
         {
-            lineRenderer.enabled = false;
+            DisableAllLines();
             return;
         }
 
-        List<Vector3> linePoints = new List<Vector3> { transform.position };
-        foreach (var enemy in enemiesInRange)
+        // 1. Find the closest enemy to the tower
+        Enemy firstTarget = SelectTarget();
+        if (firstTarget == null)
         {
-            if (enemy != null)
+            DisableAllLines();
+            return;
+        }
+
+        // 2. Chain logic: BFS from firstTarget, up to maxChainTargets, maxArcsPerEnemy per node
+        var hitEnemies = new HashSet<Enemy>();
+        var arcs = new List<(Vector3 from, Vector3 to)>();
+        var queue = new Queue<(Enemy enemy, Vector3 fromPos)>();
+
+        hitEnemies.Add(firstTarget);
+        queue.Enqueue((firstTarget, transform.position));
+        int totalTargets = 1;
+
+        while (queue.Count > 0 && totalTargets < maxChainTargets)
+        {
+            var (current, fromPos) = queue.Dequeue();
+
+            // Find up to maxArcsPerEnemy closest unhit enemies within chainRange
+            List<Enemy> nextTargets = FindClosestChainTargets(current, hitEnemies, chainRange, maxArcsPerEnemy);
+
+            int arcsCreated = 0;
+            foreach (var next in nextTargets)
             {
-                enemy.TakeDamage(damage);
-                linePoints.Add(enemy.transform.position);
-                linePoints.Add(transform.position);
+                if (totalTargets >= maxChainTargets)
+                    break;
+                if (arcsCreated >= maxArcsPerEnemy)
+                    break;
+                if (hitEnemies.Add(next))
+                {
+                    arcs.Add((current.transform.position, next.transform.position));
+                    queue.Enqueue((next, current.transform.position));
+                    totalTargets++;
+                    arcsCreated++;
+                }
             }
         }
 
-        if (linePoints.Count > 1)
+        // Add the initial arc from the tower to the first target
+        arcs.Insert(0, (transform.position, firstTarget.transform.position));
+
+        // 3. Apply effects to all hit enemies
+        foreach (Enemy target in hitEnemies)
         {
-            lineRenderer.positionCount = linePoints.Count;
-            lineRenderer.SetPositions(linePoints.ToArray());
-            lineRenderer.enabled = true;
-            lineTimer = lineDisplayTime;
+            if (target == null) continue;
+
+            target.TakeDamage(damage);
+
+            SpriteRenderer sr = target.GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                Color currentColor = sr.color;
+                Color yellow = Color.yellow;
+                sr.color = Color.Lerp(currentColor, yellow, 0.1f);
+
+                if (target is Zomboss zomboss)
+                    zomboss.UpdateSpeedBasedOnColor();
+
+                ColorChangeUtility.ShowSpriteTemporarily(this, target, sr, spriteActiveTime);
+            }
         }
-        else
+
+        // 4. Draw all arcs as individual segments using pooled LineRenderers
+        EnsureLinePoolSize(arcs.Count);
+        for (int i = 0; i < arcs.Count; i++)
         {
-            lineRenderer.enabled = false;
+            var lr = linePool[i];
+            lr.positionCount = 2;
+            lr.SetPosition(0, arcs[i].from);
+            lr.SetPosition(1, arcs[i].to);
+            lr.enabled = true;
+        }
+        // Disable any unused lines from previous frame
+        for (int i = arcs.Count; i < activeLineCount; i++)
+            linePool[i].enabled = false;
+        activeLineCount = arcs.Count;
+        lineTimer = lineDisplayTime;
+    }
+
+    private void EnsureLinePoolSize(int needed)
+    {
+        while (linePool.Count < needed)
+        {
+            var go = Instantiate(lineRendererPrefab, transform);
+            go.SetActive(true);
+            var lr = go.GetComponent<LineRenderer>();
+            lr.startWidth = 0.08f;
+            lr.endWidth = 0.05f;
+            lr.material = new Material(Shader.Find("Sprites/Default"));
+            lr.startColor = Color.cyan;
+            lr.endColor = Color.white;
+            lr.enabled = false;
+            linePool.Add(lr);
         }
     }
 
-    // Called by RangeIndicator
-    public void OnRangeTriggerEnter(Collider2D other)
+    private void DisableAllLines()
     {
-        Enemy enemy = other.GetComponent<Enemy>();
-        if (enemy != null && !enemiesInRange.Contains(enemy))
-        {
-            enemiesInRange.Add(enemy);
-        }
+        for (int i = 0; i < activeLineCount; i++)
+            linePool[i].enabled = false;
+        activeLineCount = 0;
     }
 
-    // Called by RangeIndicator
-    public void OnRangeTriggerExit(Collider2D other)
+    // Returns up to count closest enemies to 'from', not in 'exclude', within 'maxRange'
+    private List<Enemy> FindClosestChainTargets(Enemy from, HashSet<Enemy> exclude, float maxRange, int count)
     {
-        Enemy enemy = other.GetComponent<Enemy>();
-        if (enemy != null)
+        Enemy[] allEnemies = GameObject.FindObjectsOfType<Enemy>();
+        List<Enemy> candidates = new List<Enemy>();
+        foreach (var enemy in allEnemies)
         {
-            enemiesInRange.Remove(enemy);
+            if (enemy == null || exclude.Contains(enemy)) continue;
+            float dist = Vector3.Distance(from.transform.position, enemy.transform.position);
+            if (dist <= maxRange)
+            {
+                candidates.Add(enemy);
+            }
         }
+        // Sort by distance
+        candidates.Sort((a, b) =>
+            Vector3.Distance(from.transform.position, a.transform.position)
+            .CompareTo(Vector3.Distance(from.transform.position, b.transform.position)));
+        // Take up to 'count'
+        if (candidates.Count > count)
+            candidates.RemoveRange(count, candidates.Count - count);
+        return candidates;
     }
 }
