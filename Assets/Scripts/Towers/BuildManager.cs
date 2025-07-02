@@ -9,7 +9,7 @@ public class BuildManager : MonoBehaviour
 
     private TowerData selectedTower;
     private bool isBuildMode = false;
-    private GameObject previewInstance;
+    private GameObject towerPreviewInstance;
     private SpriteRenderer previewRangeRenderer;
     [Header("Preview Settings")]
     [SerializeField] private Color unaffordableColor = new Color(0.6886792f, 0.2111517f, 0.2111517f, 0.4627451f); // semi-transparent red
@@ -33,26 +33,22 @@ public class BuildManager : MonoBehaviour
         if (!isBuildMode)
         {
             selectedTower = null;
-            DestroyPreview();
+            DestroyTowerPreview();
         }
     }
 
     public void SelectTowerToBuild(TowerData tower)
     {
         selectedTower = tower;
-        CreateSimplePreviewFromPrefab();
+        CreateSimpleTowerPreviewFromPrefab();
     }
 
     private void Update()
     {
-        if (!isBuildMode)
-        {
-            DestroyPreview();
-            return;
-        }
+        if (!isBuildMode) return;
 
         HandleTowerSelectionInput();
-        UpdatePreviewPositionAndColor();
+        UpdateTowerPreviewPositionAndColor();
         HandleTowerPlacementInput();
     }
 
@@ -64,13 +60,13 @@ public class BuildManager : MonoBehaviour
         }
     }
 
-    private void UpdatePreviewPositionAndColor()
+    private void UpdateTowerPreviewPositionAndColor()
     {
-        if (previewInstance == null) return;
+        if (towerPreviewInstance == null) return;
         Vector3 mouseWorldPos = GetMouseWorldPosition();
-        previewInstance.transform.position = mouseWorldPos;
+        towerPreviewInstance.transform.position = mouseWorldPos;
         bool canAfford = PlayerResources.Instance != null && selectedTower != null && PlayerResources.Instance.Resources >= selectedTower.cost;
-        UpdatePreviewColor(canAfford);
+        UpdateTowerPreviewColor(canAfford);
     }
 
     private void HandleTowerPlacementInput()
@@ -96,21 +92,21 @@ public class BuildManager : MonoBehaviour
             Instantiate(selectedTower.towerPrefab, position, Quaternion.identity);
             // Optionally: Play build sound, animation, etc.
             if (PlayerResources.Instance.Resources < selectedTower.cost)
-                UpdatePreviewColor(false);
+                UpdateTowerPreviewColor(false);
         }
         else
         {
-            UpdatePreviewColor(false);
+            UpdateTowerPreviewColor(false);
         }
     }
 
     // Only copy the main tower sprite and the range indicator sprite
-    private void CreateSimplePreviewFromPrefab()
+    private void CreateSimpleTowerPreviewFromPrefab()
     {
-        DestroyPreview();
+        DestroyTowerPreview();
         previewRangeRenderer = null;
         if (selectedTower == null || selectedTower.towerPrefab == null) return;
-        previewInstance = new GameObject("Preview_" + selectedTower.towerPrefab.name);
+        towerPreviewInstance = new GameObject("Preview_" + selectedTower.towerPrefab.name);
 
         SpriteRenderer towerSR = null;
         SpriteRenderer rangeSR = null;
@@ -126,7 +122,7 @@ public class BuildManager : MonoBehaviour
         if (towerSR != null)
         {
             var towerObj = new GameObject("TowerSprite");
-            towerObj.transform.SetParent(previewInstance.transform);
+            towerObj.transform.SetParent(towerPreviewInstance.transform);
             towerObj.transform.localPosition = towerSR.transform.localPosition;
             towerObj.transform.localRotation = towerSR.transform.localRotation;
             towerObj.transform.localScale = towerSR.transform.localScale;
@@ -138,7 +134,7 @@ public class BuildManager : MonoBehaviour
         if (rangeSR != null)
         {
             var rangeObj = new GameObject("RangeSprite");
-            rangeObj.transform.SetParent(previewInstance.transform);
+            rangeObj.transform.SetParent(towerPreviewInstance.transform);
             rangeObj.transform.localPosition = rangeSR.transform.localPosition;
             rangeObj.transform.localRotation = rangeSR.transform.localRotation;
             rangeObj.transform.localScale = rangeSR.transform.localScale;
@@ -158,9 +154,9 @@ public class BuildManager : MonoBehaviour
         dest.material = src.sharedMaterial;
     }
 
-    private void UpdatePreviewColor(bool canAfford)
+    private void UpdateTowerPreviewColor(bool canAfford)
     {
-        if (previewInstance == null) return;
+        if (towerPreviewInstance == null) return;
         if (previewRangeRenderer != null)
         {
             if (!canAfford)
@@ -170,12 +166,12 @@ public class BuildManager : MonoBehaviour
         }
     }
 
-    private void DestroyPreview()
+    private void DestroyTowerPreview()
     {
-        if (previewInstance != null)
+        if (towerPreviewInstance != null)
         {
-            Destroy(previewInstance);
-            previewInstance = null;
+            Destroy(towerPreviewInstance);
+            towerPreviewInstance = null;
         }
     }
 }
