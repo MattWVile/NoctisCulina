@@ -64,7 +64,8 @@ public class GameManager : MonoBehaviour
         Debug.Log("Entered Build Mode");
         if (BuildManager.Instance != null)
             BuildManager.Instance.SetBuildMode(true);
-        // Optionally: Pause game logic, show build hints, etc.
+        // Hide score and wave timer UI during build mode
+        EnableGameUI(false);
     }
 
     public void ExitBuildMode()
@@ -75,7 +76,8 @@ public class GameManager : MonoBehaviour
             BuildManager.Instance.SetBuildMode(false);
             BuildManager.Instance.SelectTowerToBuild(null);
         }
-        // Optionally: Hide build hints, etc.
+        // Restore score and wave timer UI after build mode
+        EnableGameUI(true);
     }
 
     public void PauseGame()

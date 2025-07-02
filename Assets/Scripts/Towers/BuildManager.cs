@@ -13,7 +13,7 @@ public class BuildManager : MonoBehaviour
     [Header("Preview Settings")]
     [SerializeField, Range(0f, 1f)] private float previewAlpha = 0.2f;
     [SerializeField] private Color unaffordableColor = new Color(0.6886792f, 0.2111517f, 0.2111517f, 0.4627451f); // semi-transparent red
-    [SerializeField] private Color previewcolour = new Color(.5f, 1f, 1f, 0.4627451f); // semi-transparent red
+    [SerializeField] private Color previewColor = new Color(.5f, 1f, 1f, 0.4627451f); // semi-transparent preview color
 
     private void Awake()
     {
@@ -107,7 +107,7 @@ public class BuildManager : MonoBehaviour
             // Make all SpriteRenderers semi-transparent (original color, just lower alpha)
             foreach (var sr in previewInstance.GetComponentsInChildren<SpriteRenderer>())
             {
-                sr.color = previewcolour;
+                sr.color = previewColor;
             }
             // Disable any scripts/colliders on the preview
             foreach (var comp in previewInstance.GetComponents<MonoBehaviour>())
@@ -124,9 +124,7 @@ public class BuildManager : MonoBehaviour
         {
             if (canAfford)
             {
-                Color orig = sr.color;
-                orig.a = previewAlpha;
-                sr.color = new Color(orig.r, orig.g, orig.b, previewAlpha);
+                sr.color = previewColor;
             }
             else
             {
