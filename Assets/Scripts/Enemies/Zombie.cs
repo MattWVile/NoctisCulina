@@ -11,6 +11,7 @@ public class Zombie : Enemy
         GetComponent<SpriteRenderer>().enabled = false;
         ScoreWhenColurChanged = 300;
         ScoreWhenKilled = 100;
+        ResourceWhenKilled = 15; // Set resource reward for killing
     }
     public void SetSpeedToZero()
     {

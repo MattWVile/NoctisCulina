@@ -6,6 +6,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     public bool IsGamePaused { get; private set; } = true;
+    public bool IsBuildMode { get; private set; } = false; // Build mode flag
 
     [Header("Player")]
     public GameObject playerPrefab; // Assign your player prefab in the Inspector
@@ -34,15 +35,55 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        HandlePauseResumeInput();
+        HandleBuildModeToggleInput();
+    }
+
+    private void HandlePauseResumeInput()
+    {
         if (IsGamePaused && Input.GetKeyDown(KeyCode.Space))
         {
             ResumeGame();
         }
-        // Allow pausing with Escape key
         else if (!IsGamePaused && Input.GetKeyDown(KeyCode.Escape))
         {
             PauseGame();
         }
+    }
+
+    private void HandleBuildModeToggleInput()
+    {
+        if (!IsGamePaused && Input.GetKeyDown(KeyCode.B))
+        {
+            if (!IsBuildMode)
+            {
+                EnterBuildMode();
+            }
+            else
+            {
+                ExitBuildMode();
+            }
+        }
+    }
+
+    public void EnterBuildMode()
+    {
+        IsBuildMode = true;
+        Debug.Log("Entered Build Mode");
+        if (BuildManager.Instance != null)
+            BuildManager.Instance.SetBuildMode(true);
+        EnableGameUI(false); // Hide score and wave timer UI during build mode
+    }
+
+    public void ExitBuildMode()
+    {
+        IsBuildMode = false;
+        if (BuildManager.Instance != null)
+        {
+            BuildManager.Instance.SetBuildMode(false);
+            BuildManager.Instance.SelectTowerToBuild(null);
+        }
+        EnableGameUI(true); // Restore score and wave timer UI after build mode
     }
 
     public void PauseGame()
@@ -82,6 +123,10 @@ public class GameManager : MonoBehaviour
         if (startScreenUI != null)
         {
             startScreenUI.SetActive(false);
+        }
+        if (PauseScreenUI != null)
+        {
+            PauseScreenUI.SetActive(false);
         }
         EnableGameUI(true);
     }

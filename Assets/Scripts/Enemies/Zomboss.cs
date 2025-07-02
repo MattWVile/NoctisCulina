@@ -22,6 +22,7 @@ public class Zomboss : Enemy
         spriteRenderer.enabled = false;
         ScoreWhenColurChanged = 1000;
         ScoreWhenKilled = 5000;
+        ResourceWhenKilled = 250; // Set resource reward for killing
     }
 
     private void Update()

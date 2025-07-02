@@ -9,6 +9,7 @@ public abstract class Enemy : MonoBehaviour
     public float MaxSpeed { get; protected set; }
     public float CurrentSpeed { get; set; }
     public int ScoreWhenKilled { get; set; }
+    public int ResourceWhenKilled { get; set; } // NEW: Resource reward for killing
     public int ScoreWhenColurChanged { get; set; }
 
     // Tracks if the color has fully changed
@@ -34,6 +35,7 @@ public abstract class Enemy : MonoBehaviour
     public virtual void Die()
     {
         AddScore(ScoreWhenKilled);
+        AddResources(ResourceWhenKilled); // NEW: Give player resources
         Destroy(gameObject);
     }
 
@@ -95,6 +97,14 @@ public abstract class Enemy : MonoBehaviour
         else
         {
             Debug.LogError("ScoreController instance not found.");
+        }
+    }
+
+    protected void AddResources(int amount)
+    {
+        if (PlayerResources.Instance != null)
+        {
+            PlayerResources.Instance.AddResources(amount);
         }
     }
 }
