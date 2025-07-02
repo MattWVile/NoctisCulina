@@ -12,7 +12,6 @@ public class BuildManager : MonoBehaviour
     private GameObject previewInstance;
     private SpriteRenderer previewRangeRenderer;
     [Header("Preview Settings")]
-    [SerializeField, Range(0f, 1f)] private float previewAlpha = 0.2f;
     [SerializeField] private Color unaffordableColor = new Color(0.6886792f, 0.2111517f, 0.2111517f, 0.4627451f); // semi-transparent red
 
     private void Awake()
@@ -164,12 +163,7 @@ public class BuildManager : MonoBehaviour
         if (previewInstance == null) return;
         if (previewRangeRenderer != null)
         {
-            if (canAfford)
-            {
-                // Restore original color (no tint)
-                // (Assume the color is already correct from CreateSimplePreview)
-            }
-            else
+            if (!canAfford)
             {
                 previewRangeRenderer.color = unaffordableColor;
             }
