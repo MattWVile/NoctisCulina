@@ -1178,7 +1178,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19ae8df6b800bb44abee013b6bfe1da1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resources: 200000
+  resources: 2000
 --- !u!4 &859891609
 Transform:
   m_ObjectHideFlags: 0
@@ -1225,6 +1225,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   availableTowers:
   - {fileID: 11400000, guid: a8b9dfb637493cb49851f8824e891be9, type: 2}
+  previewAlpha: 0.2
+  unaffordableColor: {r: 1, g: 0.2, b: 0.2, a: 0.1}
 --- !u!4 &862048221
 Transform:
   m_ObjectHideFlags: 0

@@ -35,17 +35,24 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        HandlePauseResumeInput();
+        HandleBuildModeToggleInput();
+    }
+
+    private void HandlePauseResumeInput()
+    {
         if (IsGamePaused && Input.GetKeyDown(KeyCode.Space))
         {
             ResumeGame();
         }
-        // Allow pausing with Escape key
         else if (!IsGamePaused && Input.GetKeyDown(KeyCode.Escape))
         {
             PauseGame();
         }
+    }
 
-        // Toggle build mode with 'B'
+    private void HandleBuildModeToggleInput()
+    {
         if (!IsGamePaused && Input.GetKeyDown(KeyCode.B))
         {
             if (!IsBuildMode)
@@ -58,14 +65,14 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+
     public void EnterBuildMode()
     {
         IsBuildMode = true;
         Debug.Log("Entered Build Mode");
         if (BuildManager.Instance != null)
             BuildManager.Instance.SetBuildMode(true);
-        // Hide score and wave timer UI during build mode
-        EnableGameUI(false);
+        EnableGameUI(false); // Hide score and wave timer UI during build mode
     }
 
     public void ExitBuildMode()
@@ -76,8 +83,7 @@ public class GameManager : MonoBehaviour
             BuildManager.Instance.SetBuildMode(false);
             BuildManager.Instance.SelectTowerToBuild(null);
         }
-        // Restore score and wave timer UI after build mode
-        EnableGameUI(true);
+        EnableGameUI(true); // Restore score and wave timer UI after build mode
     }
 
     public void PauseGame()

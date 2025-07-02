@@ -41,7 +41,7 @@ public class BuildManager : MonoBehaviour
     public void SelectTowerToBuild(TowerData tower)
     {
         selectedTower = tower;
-        CreatePreview();
+        CreateSimplePreviewFromPrefab();
     }
 
     private void Update()
@@ -52,84 +52,111 @@ public class BuildManager : MonoBehaviour
             return;
         }
 
-        // Tower selection input
+        HandleTowerSelectionInput();
+        UpdatePreviewPositionAndColor();
+        HandleTowerPlacementInput();
+    }
+
+    private void HandleTowerSelectionInput()
+    {
         if (Input.GetKeyDown(KeyCode.Alpha1) && availableTowers.Length > 0)
         {
             SelectTowerToBuild(availableTowers[0]);
         }
+    }
 
-        // Update preview position and color
-        if (previewInstance != null)
-        {
-            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            mouseWorldPos.z = 0f;
-            previewInstance.transform.position = mouseWorldPos;
+    private void UpdatePreviewPositionAndColor()
+    {
+        if (previewInstance == null) return;
+        Vector3 mouseWorldPos = GetMouseWorldPosition();
+        previewInstance.transform.position = mouseWorldPos;
+        bool canAfford = PlayerResources.Instance != null && selectedTower != null && PlayerResources.Instance.Resources >= selectedTower.cost;
+        UpdatePreviewColor(canAfford);
+    }
 
-            bool canAfford = PlayerResources.Instance != null && selectedTower != null && PlayerResources.Instance.Resources >= selectedTower.cost;
-            UpdatePreviewColor(canAfford);
-        }
-
-        // Place tower on left mouse click
+    private void HandleTowerPlacementInput()
+    {
         if (selectedTower != null && Input.GetMouseButtonDown(0))
         {
-            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            mouseWorldPos.z = 0f;
+            Vector3 mouseWorldPos = GetMouseWorldPosition();
             TryBuildTower(mouseWorldPos);
         }
     }
 
+    private Vector3 GetMouseWorldPosition()
+    {
+        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mouseWorldPos.z = 0f;
+        return mouseWorldPos;
+    }
+
     private void TryBuildTower(Vector3 position)
     {
-        if (PlayerResources.Instance != null && PlayerResources.Instance.SpendResources(selectedTower.cost)) 
+        if (PlayerResources.Instance != null && PlayerResources.Instance.SpendResources(selectedTower.cost))
         {
             Instantiate(selectedTower.towerPrefab, position, Quaternion.identity);
             // Optionally: Play build sound, animation, etc.
-            // Keep preview if still affordable, else tint red
             if (PlayerResources.Instance.Resources < selectedTower.cost)
-            {
                 UpdatePreviewColor(false);
-            }
         }
         else
         {
-            // Optionally: Show not enough resources UI
             UpdatePreviewColor(false);
         }
     }
 
-    private void CreatePreview()
+    // Only copy the main tower sprite and the range indicator sprite
+    private void CreateSimplePreviewFromPrefab()
     {
         DestroyPreview();
         previewRangeRenderer = null;
-        if (selectedTower != null && selectedTower.towerPrefab != null)
+        if (selectedTower == null || selectedTower.towerPrefab == null) return;
+        previewInstance = new GameObject("Preview_" + selectedTower.towerPrefab.name);
+
+        SpriteRenderer towerSR = null;
+        SpriteRenderer rangeSR = null;
+        foreach (var sr in selectedTower.towerPrefab.GetComponentsInChildren<SpriteRenderer>(true))
         {
-            // Create an empty GameObject for the preview
-            previewInstance = new GameObject("Preview_" + selectedTower.towerPrefab.name);
-            // Copy all SpriteRenderers from the prefab (including children)
-            var prefabRenderers = selectedTower.towerPrefab.GetComponentsInChildren<SpriteRenderer>(true);
-            foreach (var prefabRenderer in prefabRenderers)
-            {
-                // Create a child GameObject for each sprite
-                GameObject child = new GameObject(prefabRenderer.gameObject.name);
-                child.transform.SetParent(previewInstance.transform);
-                child.transform.localPosition = prefabRenderer.transform.localPosition;
-                child.transform.localRotation = prefabRenderer.transform.localRotation;
-                child.transform.localScale = prefabRenderer.transform.localScale;
-                var sr = child.AddComponent<SpriteRenderer>();
-                sr.sprite = prefabRenderer.sprite;
-                sr.sortingLayerID = prefabRenderer.sortingLayerID;
-                sr.sortingOrder = prefabRenderer.sortingOrder;
-                sr.flipX = prefabRenderer.flipX;
-                sr.flipY = prefabRenderer.flipY;
-                sr.color = prefabRenderer.color;
-                sr.material = prefabRenderer.sharedMaterial;
-                // If this is the range indicator, store a reference
-                if (prefabRenderer.GetComponent<RangeController>() != null || prefabRenderer.gameObject.name.ToLower().Contains("range"))
-                {
-                    previewRangeRenderer = sr;
-                }
-            }
+            if (sr.GetComponent<RangeController>() != null || sr.gameObject.name.ToLower().Contains("range"))
+                rangeSR = sr;
+            else
+                towerSR = sr;
         }
+
+        // Copy tower sprite
+        if (towerSR != null)
+        {
+            var towerObj = new GameObject("TowerSprite");
+            towerObj.transform.SetParent(previewInstance.transform);
+            towerObj.transform.localPosition = towerSR.transform.localPosition;
+            towerObj.transform.localRotation = towerSR.transform.localRotation;
+            towerObj.transform.localScale = towerSR.transform.localScale;
+            var previewTowerSR = towerObj.AddComponent<SpriteRenderer>();
+            CopySpriteRendererProperties(towerSR, previewTowerSR);
+        }
+
+        // Copy range sprite
+        if (rangeSR != null)
+        {
+            var rangeObj = new GameObject("RangeSprite");
+            rangeObj.transform.SetParent(previewInstance.transform);
+            rangeObj.transform.localPosition = rangeSR.transform.localPosition;
+            rangeObj.transform.localRotation = rangeSR.transform.localRotation;
+            rangeObj.transform.localScale = rangeSR.transform.localScale;
+            previewRangeRenderer = rangeObj.AddComponent<SpriteRenderer>();
+            CopySpriteRendererProperties(rangeSR, previewRangeRenderer);
+        }
+    }
+
+    private void CopySpriteRendererProperties(SpriteRenderer src, SpriteRenderer dest)
+    {
+        dest.sprite = src.sprite;
+        dest.sortingLayerID = src.sortingLayerID;
+        dest.sortingOrder = src.sortingOrder;
+        dest.flipX = src.flipX;
+        dest.flipY = src.flipY;
+        dest.color = src.color;
+        dest.material = src.sharedMaterial;
     }
 
     private void UpdatePreviewColor(bool canAfford)
@@ -140,7 +167,7 @@ public class BuildManager : MonoBehaviour
             if (canAfford)
             {
                 // Restore original color (no tint)
-                // (Assume the color is already correct from CreatePreview)
+                // (Assume the color is already correct from CreateSimplePreview)
             }
             else
             {
