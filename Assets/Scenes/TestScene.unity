@@ -217,7 +217,7 @@ Transform:
   m_GameObject: {fileID: 195122848}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.053497, y: 1.1244408, z: 0.030812616}
+  m_LocalPosition: {x: -2.053497, y: 1.124441, z: 0.03081262}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1440,6 +1440,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: TeslaTower
       objectReference: {fileID: 0}
+    - target: {fileID: 9076862730279890618, guid: 9c7786ef8cabeb14091e9590b897d57b, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 9076862730279890618, guid: 9c7786ef8cabeb14091e9590b897d57b, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 9076862730279890618, guid: 9c7786ef8cabeb14091e9590b897d57b, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 40
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1709,6 +1721,14 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 6984041432663159274, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.3787879
+      objectReference: {fileID: 0}
+    - target: {fileID: 6984041432663159274, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.3787879
+      objectReference: {fileID: 0}
+    - target: {fileID: 6984041432663159274, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
       propertyPath: m_LocalPosition.x
       value: -7.078
       objectReference: {fileID: 0}
@@ -1789,6 +1809,63 @@ Transform:
   - {fileID: 1897572020}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &6906315908132547312
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1139930907072232254, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.805
+      objectReference: {fileID: 0}
+    - target: {fileID: 1139930907072232254, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1156069
+      objectReference: {fileID: 0}
+    - target: {fileID: 1139930907072232254, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1139930907072232254, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1139930907072232254, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1139930907072232254, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1139930907072232254, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1139930907072232254, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1139930907072232254, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1139930907072232254, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 6119359018677483382, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
+      propertyPath: m_Name
+      value: PhotonCannonTower
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1808,3 +1885,4 @@ SceneRoots:
   - {fileID: 1601572905}
   - {fileID: 1914760370}
   - {fileID: 195122850}
+  - {fileID: 6906315908132547312}

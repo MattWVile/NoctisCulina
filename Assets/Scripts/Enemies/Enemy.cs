@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public abstract class Enemy : MonoBehaviour
+public abstract class Enemy : MonoBehaviour, IBeamAffectable
 {
     public float TotalHealth { get; protected set; }
     public float CurrentHealth { get; protected set; }
@@ -11,6 +11,10 @@ public abstract class Enemy : MonoBehaviour
     public int ScoreWhenKilled { get; set; }
     public int ResourceWhenKilled { get; set; } // NEW: Resource reward for killing
     public int ScoreWhenColurChanged { get; set; }
+
+    private float originalMaxSpeed; // Store the original max speed for slow effects
+
+    private bool isEnemySlowed = false; // Tracks if the enemy is currently slowed
 
     // Tracks if the color has fully changed
     public bool IsColorFullyChanged { get; private set; } = false;
@@ -107,4 +111,30 @@ public abstract class Enemy : MonoBehaviour
             PlayerResources.Instance.AddResources(amount);
         }
     }
+
+    public void TakeBeamDamage(float amount)
+    {
+        TakeDamage(amount);
+    }
+
+    public void ApplySlow(float factor)
+    {
+        if (!isEnemySlowed)
+        {
+            originalMaxSpeed = MaxSpeed;
+            MaxSpeed /= factor;
+            isEnemySlowed = true;
+        }
+    }
+    public void RemoveSlow()
+    {
+        isEnemySlowed = false;
+        MaxSpeed = originalMaxSpeed;
+    }
+
+    public void MarkForExplosion()
+    {
+        throw new System.NotImplementedException();
+    }
+
 }

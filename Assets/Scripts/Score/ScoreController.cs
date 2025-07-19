@@ -53,7 +53,7 @@ public class ScoreController : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Score text component is not assigned.");
+            //Debug.LogError("Score text component is not assigned.");
         }
     }
 }
