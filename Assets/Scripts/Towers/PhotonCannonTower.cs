@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 public class PhotonCannonTower : Tower
 {
@@ -8,9 +9,11 @@ public class PhotonCannonTower : Tower
     [SerializeField]
     private float initialDamage = 5f; // Damage per attack
     [SerializeField]
-    private float initialAttacksPerSecond = 1f; // Attacks per second
+    private float initialAttacksPerSecond = .2f; // Attacks per second
     [SerializeField]
-    private float maxBeamDuration = 1f; // Cooldown between attacks
+    private float maxBeamDuration = .2f; // Time the beam is active
+
+
     public void Awake()
     {
         base.Awake(initialRange, initialDamage, initialAttacksPerSecond);
@@ -22,6 +25,17 @@ public class PhotonCannonTower : Tower
     }
     protected override void TryAttack()
     {
-        Debug.Log($"Photon Cannon Tower attacking with {damage} damage at {towerRange} range.");
+        Debug.Log($"Photon Cannon Tower attacking with {damage} damage at {towerRange} range");
+        InitializeBeam();
+    }
+    private void InitializeBeam()
+    {
+        GameObject photonBeam = Instantiate(Resources.Load<GameObject>("Prefabs/Beams/PhotonCannonBeam"), transform);
+        StartCoroutine(BeamCoroutine(photonBeam));
+    }
+    private System.Collections.IEnumerator BeamCoroutine(GameObject photonBeamToDestroy)
+    {
+        yield return new WaitForSeconds(maxBeamDuration);
+         Destroy(photonBeamToDestroy);
     }
 }
