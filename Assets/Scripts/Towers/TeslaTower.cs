@@ -11,15 +11,6 @@ public class TeslaTower : Tower
     private float lineDisplayTime = 0.08f;
     private float lineTimer = 0f;
 
-    [SerializeField]
-    private float chainRange; // Arc/chain range between enemies, independent of tower range
-
-    [SerializeField]
-    private int maxChainTargets; // Total number of enemies the arc can hit (including the first)
-
-    [SerializeField]
-    private int maxArcsPerEnemy; // How many arcs branch from each hit enemy
-
     [Header("Tesla Visuals")]
     [SerializeField]
     private float spriteActiveTime = 0.7f; // Duration the sprite is visually affected
@@ -28,10 +19,20 @@ public class TeslaTower : Tower
     private readonly List<LineRenderer> linePool = new List<LineRenderer>();
     private int activeLineCount = 0;
 
-    protected override void Awake()
+    [Header("Tower Stats")]
+    [SerializeField] protected float initialTowerRange = 20f;
+    [SerializeField] protected float initalDamage = 1f;
+    [SerializeField] protected float initalAttacksPerSecond = 1f;
+    [SerializeField] private int MaxArcsPerEnemy = 2;
+    [SerializeField] private int MaxChainTargets = 7;
+    [SerializeField] private float ChainRange = 7;
+
+
+
+    protected void Awake()
     {
-        base.Awake();
-        SetStats(20f, 3.3f, 7, 0f, 1.3f, 2);
+        base.Awake(initialTowerRange, initalDamage, initalAttacksPerSecond);
+        SetStats(initialTowerRange, initalDamage, initalAttacksPerSecond, ChainRange, MaxChainTargets, MaxArcsPerEnemy);
         // Optionally create a default prefab if not set
         if (lineRendererPrefab == null)
         {
@@ -48,14 +49,14 @@ public class TeslaTower : Tower
         }
     }
 
-    public void SetStats(float newRange, float newChainRange, int newMaxChainTargets, float newDamage, float newAttacksPerSecond, int newMaxArcsPerEnemy)
+    public void SetStats(float newRange, float newDamage, float newAttacksPerSecond, float newChainRange, int newMaxChainTargets, int newMaxArcsPerEnemy)
     {
         towerRange = newRange;
-        chainRange = newChainRange;
-        maxChainTargets = Mathf.Max(1, newMaxChainTargets);
+        ChainRange = newChainRange;
+        MaxChainTargets = Mathf.Max(1, newMaxChainTargets);
         damage = newDamage;
         attacksPerSecond = newAttacksPerSecond;
-        maxArcsPerEnemy = Mathf.Max(1, newMaxArcsPerEnemy);
+        MaxArcsPerEnemy = Mathf.Max(1, newMaxArcsPerEnemy);
 
         if (rangeIndicator != null)
             rangeIndicator.SetRange(towerRange);
@@ -100,19 +101,19 @@ public class TeslaTower : Tower
         queue.Enqueue((firstTarget, transform.position));
         int totalTargets = 1;
 
-        while (queue.Count > 0 && totalTargets < maxChainTargets)
+        while (queue.Count > 0 && totalTargets < MaxChainTargets)
         {
             var (current, fromPos) = queue.Dequeue();
 
             // Find up to maxArcsPerEnemy closest unhit enemies within chainRange
-            List<Enemy> nextTargets = FindClosestChainTargets(current, hitEnemies, chainRange, maxArcsPerEnemy);
+            List<Enemy> nextTargets = FindClosestChainTargets(current, hitEnemies, ChainRange, MaxArcsPerEnemy);
 
             int arcsCreated = 0;
             foreach (var next in nextTargets)
             {
-                if (totalTargets >= maxChainTargets)
+                if (totalTargets >= MaxChainTargets)
                     break;
-                if (arcsCreated >= maxArcsPerEnemy)
+                if (arcsCreated >= MaxArcsPerEnemy)
                     break;
                 if (hitEnemies.Add(next))
                 {

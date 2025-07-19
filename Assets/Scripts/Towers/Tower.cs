@@ -29,12 +29,13 @@ public abstract class Tower : MonoBehaviour
     // Managed by collider triggers for most towers, or ignored for global towers
     protected readonly List<Enemy> enemiesInRange = new List<Enemy>();
 
-    protected virtual void Awake()
+    protected virtual void Awake(float towerRange, float damage, float attacksPerSecond)
     {
         if (rangeIndicator == null)
             rangeIndicator = GetComponentInChildren<RangeController>();
         if (rangeIndicator != null)
             rangeIndicator.SetRange(towerRange);
+        SetStats(towerRange, damage, attacksPerSecond);
     }
 
     public virtual void SetStats(float newRange, float newDamage, float newAttacksPerSecond)
