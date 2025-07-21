@@ -12,11 +12,20 @@ public class GameManager : MonoBehaviour
     public GameObject playerPrefab; // Assign your player prefab in the Inspector
     public Vector3 playerSpawnPosition = Vector3.zero; // Set your default spawn position
 
+    [SerializeField] private SpriteRenderer playerLightCone;
+
     [SerializeField] private GameObject startScreenUI;
     [SerializeField] private GameObject scoreUI;
     [SerializeField] private GameObject waveTimerUI;
     [SerializeField] private GameObject PauseScreenUI;
 
+    private void Start()
+    {
+        if (playerLightCone == null)
+        {
+            playerLightCone = GameObject.FindGameObjectWithTag("PlayerLightCone").GetComponent<SpriteRenderer>();
+        }
+    }
     private void Awake()
     {
         // Singleton pattern
@@ -65,6 +74,17 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+    public void TogglePlayerLightCone(bool isEnabled)
+    {
+        if (playerLightCone != null)
+        {
+            playerLightCone.enabled = isEnabled;
+        }
+        else
+        {
+            Debug.LogWarning("Player Light Cone SpriteRenderer not found!");
+        }
+    }
 
     public void EnterBuildMode()
     {
@@ -72,6 +92,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("Entered Build Mode");
         if (BuildManager.Instance != null)
             BuildManager.Instance.SetBuildMode(true);
+        TogglePlayerLightCone(false);
         EnableGameUI(false); // Hide score and wave timer UI during build mode
     }
 
@@ -81,7 +102,7 @@ public class GameManager : MonoBehaviour
         if (BuildManager.Instance != null)
         {
             BuildManager.Instance.SetBuildMode(false);
-            BuildManager.Instance.SelectTowerToBuild(null);
+            TogglePlayerLightCone(true);
         }
         EnableGameUI(true); // Restore score and wave timer UI after build mode
     }

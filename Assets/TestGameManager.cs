@@ -54,7 +54,7 @@ public class TestGameManager : MonoBehaviour
         IsBuildMode = true;
         if (BuildManager.Instance != null)
             BuildManager.Instance.SetBuildMode(true);
-        TogglePlayerLightCone(!IsBuildMode);
+            TogglePlayerLightCone(false);
     }
 
     public void ExitBuildMode()
@@ -63,9 +63,7 @@ public class TestGameManager : MonoBehaviour
         if (BuildManager.Instance != null)
         {
             BuildManager.Instance.SetBuildMode(false);
-            BuildManager.Instance.SelectTowerToBuild(null);
-            //BuildManager.Instance.DisableUI();
-            TogglePlayerLightCone(!IsBuildMode);
+            TogglePlayerLightCone(true);
         }
     }
 }

@@ -11,6 +11,10 @@ public class BuildManager : MonoBehaviour
     private bool isBuildMode = false;
     private GameObject towerPreviewInstance;
     private SpriteRenderer previewRangeRenderer;
+
+    private GameObject buildModeUIPrefab;
+    private GameObject buildModeUIGameObject;
+
     [Header("Preview Settings")]
     [SerializeField] private Color unaffordableColor = new Color(0.6886792f, 0.2111517f, 0.2111517f, 0.4627451f); // semi-transparent red
 
@@ -25,6 +29,7 @@ public class BuildManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        buildModeUIPrefab = Resources.Load<GameObject>("Prefabs/UI/BuildModeUI");
     }
 
     public void SetBuildMode(bool enabled)
@@ -34,11 +39,13 @@ public class BuildManager : MonoBehaviour
         {
             selectedTower = null;
             DestroyTowerPreview();
-
+            SelectTowerToBuild(null);
+            ToggleUIElements(false);
         }
         else
         {
             CreateSimpleTowerPreviewFromPrefab();
+            ToggleUIElements(true);
         }
     }
 
@@ -56,18 +63,20 @@ public class BuildManager : MonoBehaviour
         UpdateTowerPreviewPositionAndColor();
         HandleTowerPlacementInput();
     }
-
     private void HandleTowerSelectionInput()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1) && availableTowers.Length > 0)
+        for (int i = 0; i < availableTowers.Length; i++)
         {
-            SelectTowerToBuild(availableTowers[0]);
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha2) && availableTowers.Length > 0)
-        {
-            SelectTowerToBuild(availableTowers[1]);
+            // KeyCode.Alpha1 == 49, so add i to get Alpha1..Alpha9
+            if (Input.GetKeyDown(KeyCode.Alpha1 + i))
+            {
+                SelectTowerToBuild(availableTowers[i]);
+                ToggleUIElements(false);
+                break;
+            }
         }
     }
+
 
     private void UpdateTowerPreviewPositionAndColor()
     {
@@ -181,6 +190,17 @@ public class BuildManager : MonoBehaviour
         {
             Destroy(towerPreviewInstance);
             towerPreviewInstance = null;
+        }
+    }
+
+    public void ToggleUIElements(bool isEnabled)
+    {
+        if (isEnabled) { 
+            buildModeUIGameObject = Instantiate(buildModeUIPrefab);
+        }
+        else
+        {
+            Destroy(buildModeUIGameObject);
         }
     }
 }
