@@ -12,6 +12,7 @@ TagManager:
   - PlayerLightCircle
   - Zombie
   - Zomboss
+  - PlayerLightCone
   layers:
   - Default
   - TransparentFX
