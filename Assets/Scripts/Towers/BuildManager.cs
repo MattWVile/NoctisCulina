@@ -58,6 +58,10 @@ public class BuildManager : MonoBehaviour
         {
             SelectTowerToBuild(availableTowers[0]);
         }
+        else if (Input.GetKeyDown(KeyCode.Alpha2) && availableTowers.Length > 0)
+        {
+            SelectTowerToBuild(availableTowers[1]);
+        }
     }
 
     private void UpdateTowerPreviewPositionAndColor()

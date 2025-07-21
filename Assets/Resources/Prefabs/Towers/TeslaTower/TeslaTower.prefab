@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 1214993933312562871}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.29695955}
+  m_LocalPosition: {x: 0, y: 0, z: -0.2969595}
   m_LocalScale: {x: 4, y: 4, z: 4}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -118,7 +118,7 @@ CircleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.00000011920929, y: 0.00000011920929}
+  m_Offset: {x: -0.0000001192093, y: 0.0000001192093}
   serializedVersion: 2
   m_Radius: 0.5
 --- !u!114 &3876724635000947236
@@ -344,7 +344,10 @@ MonoBehaviour:
   rangeIndicator: {fileID: 0}
   lineRendererPrefab: {fileID: 0}
   lineDisplayTime: 0.08
-  chainRange: 0
-  maxChainTargets: 0
-  maxArcsPerEnemy: 0
   spriteActiveTime: 0.5
+  initialTowerRange: 20
+  initalDamage: 1
+  initalAttacksPerSecond: 1
+  MaxArcsPerEnemy: 2
+  MaxChainTargets: 7
+  ChainRange: 7
