@@ -6,10 +6,15 @@ public class TestGameManager : MonoBehaviour
 {
 
     public bool IsBuildMode { get; private set; } = false; // Build mode flag
-    // Start is called before the first frame update
-    void Start()
+                                                           // Start is called before the first frame update
+    [SerializeField] private SpriteRenderer playerLightCone;
+
+    private void Start()
     {
-        
+        if (playerLightCone == null)
+        {
+            playerLightCone = GameObject.FindGameObjectWithTag("PlayerLightCone").GetComponent<SpriteRenderer>();
+        }
     }
 
     // Update is called once per frame
@@ -32,21 +37,35 @@ public class TestGameManager : MonoBehaviour
         }
     }
 
+    public void TogglePlayerLightCone(bool isEnabled)
+    {
+        if (playerLightCone != null)
+        {
+            playerLightCone.enabled = isEnabled;
+        }
+        else
+        {
+            Debug.LogWarning("Player Light Cone SpriteRenderer not found!");
+        }
+    }
+
     public void EnterBuildMode()
     {
-        Debug.Log("Entered Build Mode");
+        IsBuildMode = true;
         if (BuildManager.Instance != null)
             BuildManager.Instance.SetBuildMode(true);
+        TogglePlayerLightCone(!IsBuildMode);
     }
 
     public void ExitBuildMode()
     {
+        IsBuildMode = false;
         if (BuildManager.Instance != null)
         {
             BuildManager.Instance.SetBuildMode(false);
             BuildManager.Instance.SelectTowerToBuild(null);
+            //BuildManager.Instance.DisableUI();
+            TogglePlayerLightCone(!IsBuildMode);
         }
     }
-
-
 }

@@ -34,6 +34,11 @@ public class BuildManager : MonoBehaviour
         {
             selectedTower = null;
             DestroyTowerPreview();
+
+        }
+        else
+        {
+            CreateSimpleTowerPreviewFromPrefab();
         }
     }
 
