@@ -184,11 +184,6 @@ public class GameManager : MonoBehaviour
         {
             cameraFollow.SetPlayer(newPlayer.transform);
         }        
-        EnemyMovementController enemyMovementController = FindObjectOfType<EnemyMovementController>();
-        if (enemyMovementController != null && newPlayer != null)
-        {
-            enemyMovementController.SetPlayer(newPlayer);
-        }
 
         // Reset score
         if (ScoreController.Instance != null)

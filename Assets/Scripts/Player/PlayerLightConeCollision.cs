@@ -148,6 +148,7 @@ public class PlayerLightConeCollision : MonoBehaviour
     private void HandleZombieExit(Zombie zombie)
     {
         // Restore the zombie's speed
+        zombie.ResetToMaxSpeed();
         zombie.CurrentSpeed = zombie.MaxSpeed;
 
         // Get the SpriteRenderer component
