@@ -37,7 +37,7 @@ public class PhotonBeamCollisionHandler : MonoBehaviour
         if (TryGetBeamTarget(other, out var enemy))
         {
             _enemiesInBeam.Remove(enemy);
-            enemy.RemoveSlow();
+            enemy.ResetToMaxSpeed();
         }
     }
 

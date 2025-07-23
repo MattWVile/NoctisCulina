@@ -1,5 +1,6 @@
-using UnityEngine;
+using Pathfinding;
 using System.Collections;
+using UnityEngine;
 
 public abstract class Enemy : MonoBehaviour, IBeamAffectable
 {
@@ -12,7 +13,7 @@ public abstract class Enemy : MonoBehaviour, IBeamAffectable
     public int ResourceWhenKilled { get; set; } // NEW: Resource reward for killing
     public int ScoreWhenColurChanged { get; set; }
 
-    private float originalMaxSpeed; // Store the original max speed for slow effects
+    public float originalMaxSpeed; // Store the original max speed for slow effects
 
     private bool isEnemySlowed = false; // Tracks if the enemy is currently slowed
 
@@ -121,15 +122,36 @@ public abstract class Enemy : MonoBehaviour, IBeamAffectable
     {
         if (!isEnemySlowed)
         {
-            originalMaxSpeed = MaxSpeed;
-            MaxSpeed /= factor;
+            var aiPath = GetComponent<AIPath>();
+            if (aiPath != null)
+            {
+                originalMaxSpeed = aiPath.maxSpeed;
+                aiPath.maxSpeed /= factor;
+            }
+            else
+            {
+                originalMaxSpeed = MaxSpeed;
+                MaxSpeed /= factor;
+            }
             isEnemySlowed = true;
         }
     }
-    public void RemoveSlow()
+
+    public void ResetToMaxSpeed()
     {
-        isEnemySlowed = false;
-        MaxSpeed = originalMaxSpeed;
+        var aiPath = GetComponent<AIPath>();
+        if (aiPath != null)
+        {
+            aiPath.maxSpeed = originalMaxSpeed;
+        }
+        else
+        {
+            MaxSpeed = originalMaxSpeed;
+        }
+        if (isEnemySlowed)
+        {
+            isEnemySlowed = false;
+        }
     }
 
     public void MarkForExplosion()

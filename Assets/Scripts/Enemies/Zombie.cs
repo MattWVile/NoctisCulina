@@ -13,6 +13,7 @@ public class Zombie : Enemy
         ScoreWhenKilled = 100;
         ResourceWhenKilled = 15; // Set resource reward for killing
         GetComponent<AIPath>().maxSpeed = MaxSpeed; // Set the AIPath max speed to match the zombie's max speed
+        originalMaxSpeed = MaxSpeed; // Store the original max speed for slow effects
         var playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
         {
@@ -31,14 +32,5 @@ public class Zombie : Enemy
         }
 
         GetComponent<AIPath>().maxSpeed = 0f; // Set this zombie's speed to zero
-    }
-
-    public void ResetToMaxSpeed()
-    {
-        if (GetComponent<AIPath>().maxSpeed == MaxSpeed)
-        {
-            return; // Speed is already at max, no need to reset
-        }
-        GetComponent<AIPath>().maxSpeed = MaxSpeed; // Reset this zombie's speed to its maximum
     }
 }
