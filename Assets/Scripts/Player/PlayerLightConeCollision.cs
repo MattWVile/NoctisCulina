@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public class PlayerLightConeCollision : MonoBehaviour
 {
     [SerializeField]
-    private float timeToDeactivateSprite = 0.7f; // Time to disable sprite after exiting light cone
 
     private Dictionary<Zombie, Coroutine> zombieColorChangeCoroutines = new Dictionary<Zombie, Coroutine>();
     private Dictionary<Zombie, float> zombieElapsedTimes = new Dictionary<Zombie, float>();
@@ -22,11 +21,16 @@ public class PlayerLightConeCollision : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         HandleEnemyLogic(collision);
+        if (collision.CompareTag("PhotonCannon"))
+        {
+            collision.GetComponent<PhotonCannonTower>().currentAttacksPerSecond = 10;
+        }
     }
 
     private void OnTriggerStay2D(Collider2D collision)
     {
         HandleEnemyLogic(collision);
+
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -66,6 +70,11 @@ public class PlayerLightConeCollision : MonoBehaviour
                 Coroutine coroutine = StartCoroutine(DelayedSpriteDisable(zomboss));
                 zombossExitCoroutines[zomboss] = coroutine;
             }
+        }
+        else if (collision.CompareTag("PhotonCannon"))
+        {
+            PhotonCannonTower photonCannon = collision.GetComponent<PhotonCannonTower>();
+            photonCannon.currentAttacksPerSecond = photonCannon.initialAttacksPerSecond;
         }
     }
 

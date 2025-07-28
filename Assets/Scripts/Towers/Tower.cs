@@ -14,14 +14,14 @@ public abstract class Tower : MonoBehaviour
     [Header("Tower Stats")]
     [SerializeField] protected float towerRange = 20f;
     [SerializeField] protected float damage = 1f;
-    [SerializeField] protected float attacksPerSecond = 1f;
+    [SerializeField] public float currentAttacksPerSecond = 1f;
     [SerializeField] protected TargetingMode targetingMode = TargetingMode.Closest;
 
     [SerializeField] protected RangeController rangeIndicator;
 
     public float Range => towerRange;
     public float Damage => damage;
-    public float AttacksPerSecond => attacksPerSecond;
+    public float AttacksPerSecond => currentAttacksPerSecond;
     public TargetingMode CurrentTargetingMode => targetingMode;
 
     protected float attackCooldown = 0f;
@@ -42,7 +42,7 @@ public abstract class Tower : MonoBehaviour
     {
         towerRange = newRange;
         damage = newDamage;
-        attacksPerSecond = newAttacksPerSecond;
+        currentAttacksPerSecond = newAttacksPerSecond;
 
         if (rangeIndicator != null)
             rangeIndicator.SetRange(towerRange);
@@ -59,7 +59,7 @@ public abstract class Tower : MonoBehaviour
         if (attackCooldown <= 0f)
         {
             TryAttack();
-            attackCooldown = 1f / attacksPerSecond;
+            attackCooldown = 1f / currentAttacksPerSecond;
         }
 
         if (rangeIndicator != null)

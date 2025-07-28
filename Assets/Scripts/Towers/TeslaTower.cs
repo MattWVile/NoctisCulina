@@ -55,7 +55,7 @@ public class TeslaTower : Tower
         ChainRange = newChainRange;
         MaxChainTargets = Mathf.Max(1, newMaxChainTargets);
         damage = newDamage;
-        attacksPerSecond = newAttacksPerSecond;
+        currentAttacksPerSecond = newAttacksPerSecond;
         MaxArcsPerEnemy = Mathf.Max(1, newMaxArcsPerEnemy);
 
         if (rangeIndicator != null)
