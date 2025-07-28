@@ -17,6 +17,7 @@ public class Zomboss : Enemy
         TotalHealth = 280f;
         Damage = 2f;
         MaxSpeed = .4f;
+        colourChangeDuration = 10f; // Set the color change duration for the Zomboss
         CurrentSpeed = MaxSpeed;
         spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.enabled = false;

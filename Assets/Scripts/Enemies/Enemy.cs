@@ -1,5 +1,6 @@
 using Pathfinding;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Enemy : MonoBehaviour, IBeamAffectable
@@ -22,6 +23,8 @@ public abstract class Enemy : MonoBehaviour, IBeamAffectable
     public bool HasScoreBeenAwarded { get; set; } = false;
     public bool IsInLightCone { get; set; }
     public bool IsInLightCircle { get; set; }
+
+    public float colourChangeDuration { get; set; }
 
     protected virtual void Start()
     {
@@ -55,34 +58,8 @@ public abstract class Enemy : MonoBehaviour, IBeamAffectable
         if (spriteRenderer == null) return;
 
         // Always enable if color is fully changed
-        if (IsColorFullyChanged)
-        {
-            spriteRenderer.enabled = true;
-        }
-        else
-        {
-            spriteRenderer.enabled = IsInLightCone || IsInLightCircle;
-        }
-    }
+        spriteRenderer.enabled = true;
 
-    // Deprecated: Prefer UpdateSpriteRendererState for coordinated logic
-    public virtual void ToggleSpriteRenderer(float timeDelay = 0f)
-    {
-        if (!IsColorFullyChanged)
-        {
-            StartCoroutine(ToggleSpriteRendererCoroutine(timeDelay));
-        }
-    }
-
-    private IEnumerator ToggleSpriteRendererCoroutine(float timeDelay)
-    {
-        yield return new WaitForSeconds(timeDelay);
-
-        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
-        if (spriteRenderer != null && !IsColorFullyChanged)
-        {
-            spriteRenderer.enabled = !spriteRenderer.enabled;
-        }
     }
 
     // Mark the color as fully changed and update sprite state
@@ -158,5 +135,13 @@ public abstract class Enemy : MonoBehaviour, IBeamAffectable
     {
         throw new System.NotImplementedException();
     }
+    public void SetSpeedToZero()
+    {
+        if (GetComponent<AIPath>().maxSpeed == 0f)
+        {
+            return; // Speed is already zero, no need to set it again
+        }
 
+        GetComponent<AIPath>().maxSpeed = 0f; // Set this zombie's speed to zero
+    }
 }

@@ -8,6 +8,7 @@ public class Zombie : Enemy
         TotalHealth = 11f;
         Damage = 1f;
         MaxSpeed = 1f;
+        colourChangeDuration  =1.5f; // Set the color change duration for the zombie
         GetComponent<SpriteRenderer>().enabled = false;
         ScoreWhenColurChanged = 300;
         ScoreWhenKilled = 100;
@@ -23,14 +24,5 @@ public class Zombie : Enemy
                 destinationSetter.target = playerObj.transform;
             }
         }
-    }
-    public void SetSpeedToZero()
-    {
-        if (GetComponent<AIPath>().maxSpeed == 0f)
-        {
-            return; // Speed is already zero, no need to set it again
-        }
-
-        GetComponent<AIPath>().maxSpeed = 0f; // Set this zombie's speed to zero
     }
 }
