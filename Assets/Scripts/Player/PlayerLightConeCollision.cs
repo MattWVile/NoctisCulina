@@ -23,7 +23,7 @@ public class PlayerLightConeCollision : MonoBehaviour
         HandleEnemyLogic(collision);
         if (collision.CompareTag("PhotonCannon"))
         {
-            collision.GetComponent<PhotonCannonTower>().currentAttacksPerSecond = 10;
+            collision.GetComponent<PhotonCannonTower>().currentAttacksPerSecond = 3;
         }
     }
 

@@ -5,10 +5,11 @@ public class PhotonCannonTower : Tower
     //[Header("Photon Cannon Stats")]
     private float initialRange = 20f;
     private float initialDamage = 5f;// Damage per attack
-    private float maxBeamDuration = .2f;// Time the beam is active
+    private float maxBeamDuration = .5f;// Time the beam is active
 
     public float initialAttacksPerSecond = 2f;// Attacks per second
     public PhotonBeamChargeBar photonBeamChargeBar;
+    private bool isBeamActive = false;
 
     public void Awake()
     {
@@ -29,6 +30,8 @@ public class PhotonCannonTower : Tower
     }
     private void ChargeShot()
     {
+        if (isBeamActive)
+            return; // Do not charge if the beam is already active
         if (!photonBeamChargeBar.isCharged)
         {
             photonBeamChargeBar.FillBar(currentAttacksPerSecond);
@@ -43,7 +46,9 @@ public class PhotonCannonTower : Tower
     }
     private System.Collections.IEnumerator BeamCoroutine(GameObject photonBeamToDestroy)
     {
+        isBeamActive = true;
         yield return new WaitForSeconds(maxBeamDuration);
          Destroy(photonBeamToDestroy);
+        isBeamActive = false;
     }
 }

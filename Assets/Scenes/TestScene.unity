@@ -221,9 +221,9 @@ Transform:
   m_GameObject: {fileID: 106924453}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: 0, y: 0.75, z: 0}
+  m_LocalScale: {x: 1.21, y: 1.21, z: 1.21}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 654002963}
   - {fileID: 579581502}
@@ -243,6 +243,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   foreground: {fileID: 654002962}
   maxCharge: 10.16
+  isCharged: 0
 --- !u!1 &195122848
 GameObject:
   m_ObjectHideFlags: 0
@@ -542,6 +543,10 @@ PrefabInstance:
     - target: {fileID: 8180261063808567810, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
       propertyPath: m_Name
       value: Zombie (14)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8180261063808567810, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8189269484788926252, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
       propertyPath: maxAcceleration
@@ -947,7 +952,7 @@ GameObject:
   m_Component:
   - component: {fileID: 579581502}
   - component: {fileID: 579581503}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1031,7 +1036,7 @@ GameObject:
   m_Component:
   - component: {fileID: 654002963}
   - component: {fileID: 654002964}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Foreground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1095,7 +1100,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.70980394, g: 0.98823535, b: 0.97647065, a: 1}
+  m_Color: {r: 0.12941177, g: 0.83921576, b: 0.9686275, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1245,6 +1250,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Zombie (13)
       objectReference: {fileID: 0}
+    - target: {fileID: 8180261063808567810, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8189269484788926252, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
       propertyPath: maxAcceleration
       value: 25
@@ -1326,6 +1335,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Zombie (11)
       objectReference: {fileID: 0}
+    - target: {fileID: 8180261063808567810, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8189269484788926252, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
       propertyPath: maxAcceleration
       value: 25
@@ -1343,6 +1356,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 646755682302132959, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1139930907072232254, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
       propertyPath: m_LocalPosition.x
       value: 2.99
@@ -1383,9 +1400,41 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 10.111
       objectReference: {fileID: 0}
+    - target: {fileID: 2541274816748562982, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
+      propertyPath: maxBeamDuration
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2541274816748562982, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
+      propertyPath: photonBeamChargeBar
+      value: 
+      objectReference: {fileID: 106924455}
+    - target: {fileID: 2541274816748562982, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
+      propertyPath: initialAttacksPerSecond
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5076202237714679680, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
+      propertyPath: m_IncludeLayers.m_Bits
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 6119359018677483382, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
       propertyPath: m_Name
       value: PhotonCannonTower
+      objectReference: {fileID: 0}
+    - target: {fileID: 6119359018677483382, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6119359018677483382, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
+      propertyPath: m_TagString
+      value: PhotonCannon
+      objectReference: {fileID: 0}
+    - target: {fileID: 7136550011477349757, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7136550011477349757, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1393,7 +1442,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1139930907072232254, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 106924454}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6119359018677483382, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1837307522}
   m_SourcePrefab: {fileID: 100100000, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
 --- !u!1 &949706072
 GameObject:
@@ -1558,6 +1610,10 @@ PrefabInstance:
     - target: {fileID: 8180261063808567810, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
       propertyPath: m_Name
       value: Zombie (15)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8180261063808567810, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8189269484788926252, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
       propertyPath: maxAcceleration
@@ -1978,6 +2034,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Zombie (12)
       objectReference: {fileID: 0}
+    - target: {fileID: 8180261063808567810, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8189269484788926252, guid: d6b93ad0650c686419dd2aa1138f603e, type: 3}
       propertyPath: maxAcceleration
       value: 25
@@ -2203,11 +2263,43 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1837307518 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6119359018677483382, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
+  m_PrefabInstance: {fileID: 930827052}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1837307521 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1139930907072232254, guid: f515a7aff7e6b5344867d9a017d49cbb, type: 3}
   m_PrefabInstance: {fileID: 930827052}
   m_PrefabAsset: {fileID: 0}
+--- !u!50 &1837307522
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1837307518}
+  m_BodyType: 2
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!1 &1897572019
 GameObject:
   m_ObjectHideFlags: 0
