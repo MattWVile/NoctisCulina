@@ -8,7 +8,7 @@ public class Zombie : Enemy
         TotalHealth = 11f;
         Damage = 1f;
         MaxSpeed = 1f;
-        colourChangeDuration  =1.5f; // Set the color change duration for the zombie
+        colourChangeDuration = 1.5f; // Set the color change duration for the zombie
         GetComponent<SpriteRenderer>().enabled = false;
         ScoreWhenColurChanged = 300;
         ScoreWhenKilled = 100;

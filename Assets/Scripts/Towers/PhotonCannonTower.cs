@@ -57,7 +57,7 @@ public class PhotonCannonTower : Tower
         if (enemy != null)
         {
             enemiesInRange.Add(enemy);
-            //enemy.UpdateSpriteRendererState(); // Disable sprite renderer when in range
+            enemy.UpdateSpriteRendererState(false);
         }
     }
 

@@ -380,7 +380,7 @@ namespace Pathfinding {
 				if (path.immediateCallback != null) path.immediateCallback(path);
 
 				if (OnPathPostSearch != null) {
-					OnPathPostSearch(path);
+					//OnPathPostSearch(path);
 				}
 
 				// Push the path onto the return stack

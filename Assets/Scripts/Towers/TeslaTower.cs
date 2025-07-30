@@ -13,7 +13,7 @@ public class TeslaTower : Tower
 
     [Header("Tesla Visuals")]
     [SerializeField]
-    private float spriteActiveTime = 0.7f; // Duration the sprite is visually affected
+    private float spriteActiveTime = 3f; // Duration the sprite is visually affected
 
     // Pool for LineRenderers
     private readonly List<LineRenderer> linePool = new List<LineRenderer>();

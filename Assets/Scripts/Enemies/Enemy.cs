@@ -1,6 +1,5 @@
 using Pathfinding;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Enemy : MonoBehaviour, IBeamAffectable
@@ -34,8 +33,6 @@ public abstract class Enemy : MonoBehaviour, IBeamAffectable
 
     public virtual void TakeDamage(float damageAmount)
     {
-
-        IsTakingDamage = true; 
         CurrentHealth -= damageAmount;
         if (CurrentHealth <= 0)
         {
@@ -51,7 +48,7 @@ public abstract class Enemy : MonoBehaviour, IBeamAffectable
     }
 
     // Use this to update sprite visibility based on light/circle and color state
-    public void UpdateSpriteRendererState()
+    public void UpdateSpriteRendererState(bool setToEnabled = true)
     {
         // Prevent running if this object is destroyed
         if (this == null || gameObject == null)
@@ -63,6 +60,10 @@ public abstract class Enemy : MonoBehaviour, IBeamAffectable
         if (IsColorFullyChanged)
         {
             spriteRenderer.enabled = true;
+        }
+        else if (!setToEnabled)
+        {
+            spriteRenderer.enabled = false;
         }
         else
         {
@@ -155,8 +156,7 @@ public abstract class Enemy : MonoBehaviour, IBeamAffectable
         }
         if (isEnemySlowed)
         {
-            isEnemySlowed = false;
-            IsTakingDamage = false; // Mark as affected by beam
+            isEnemySlowed = false;// Mark as affected by beam
         }
     }
 
