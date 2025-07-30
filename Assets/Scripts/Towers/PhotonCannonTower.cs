@@ -4,7 +4,7 @@ public class PhotonCannonTower : Tower
 {
     //[Header("Photon Cannon Stats")]
     private float initialRange = 20f;
-    private float initialDamage = 5f;// Damage per attack
+    private float initialDamage = 0.1f;// Damage per attack
     private float maxBeamDuration = .5f;// Time the beam is active
 
     public float initialAttacksPerSecond = 2f;// Attacks per second
@@ -51,4 +51,24 @@ public class PhotonCannonTower : Tower
          Destroy(photonBeamToDestroy);
         isBeamActive = false;
     }
+    public override void OnRangeTriggerEnter(Collider2D other)
+    {
+        Enemy enemy = other.GetComponent<Enemy>();
+        if (enemy != null)
+        {
+            enemiesInRange.Add(enemy);
+            //enemy.UpdateSpriteRendererState(); // Disable sprite renderer when in range
+        }
+    }
+
+    public override void OnRangeTriggerExit(Collider2D other)
+    {
+        Enemy enemy = other.GetComponent<Enemy>();
+        if (enemy != null)
+        {
+            enemiesInRange.Remove(enemy);
+            // Do nothing to the sprite on exit
+        }
+    }
+
 }

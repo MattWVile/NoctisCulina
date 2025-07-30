@@ -33,8 +33,9 @@ public class PhotonBeamCollisionHandler : MonoBehaviour
         {
             _enemiesInBeam.Add(enemy);
             enemy.ApplySlow(slowFactor);
-            enemy.UpdateSpriteRendererState();
             HandleEnemyEnterOrStay(enemy);
+            enemy.IsTakingDamage = true;
+            enemy.UpdateSpriteRendererState();
         }
     }
 
@@ -44,8 +45,9 @@ public class PhotonBeamCollisionHandler : MonoBehaviour
         {
             _enemiesInBeam.Remove(enemy);
             enemy.ResetToMaxSpeed();
-            enemy.UpdateSpriteRendererState();
             HandlEnemyExit(enemy);
+            enemy.IsTakingDamage = false;
+            enemy.UpdateSpriteRendererState();
         }
     }
 
@@ -114,6 +116,7 @@ public class PhotonBeamCollisionHandler : MonoBehaviour
     {
         // Restore the zombie's speed
         enemy.ResetToMaxSpeed();
+        enemy.IsTakingDamage = false;
 
         // Get the SpriteRenderer component
         SpriteRenderer spriteRenderer = enemy.GetComponent<SpriteRenderer>();

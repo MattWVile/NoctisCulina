@@ -26,6 +26,7 @@ public abstract class Enemy : MonoBehaviour, IBeamAffectable
 
     public float colourChangeDuration { get; set; }
 
+    public bool IsTakingDamage { get; set; } = false; // Tracks if the enemy is currently affected by a beam  
     protected virtual void Start()
     {
         CurrentHealth = TotalHealth;
@@ -33,6 +34,8 @@ public abstract class Enemy : MonoBehaviour, IBeamAffectable
 
     public virtual void TakeDamage(float damageAmount)
     {
+
+        IsTakingDamage = true; 
         CurrentHealth -= damageAmount;
         if (CurrentHealth <= 0)
         {
@@ -53,13 +56,38 @@ public abstract class Enemy : MonoBehaviour, IBeamAffectable
         // Prevent running if this object is destroyed
         if (this == null || gameObject == null)
             return;
-
         SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer == null) return;
 
         // Always enable if color is fully changed
-        spriteRenderer.enabled = true;
+        if (IsColorFullyChanged)
+        {
+            spriteRenderer.enabled = true;
+        }
+        else
+        {
+            spriteRenderer.enabled = IsInLightCone || IsInLightCircle || IsTakingDamage;
+        }
+    }
 
+    // Deprecated: Prefer UpdateSpriteRendererState for coordinated logic
+    public virtual void ToggleSpriteRenderer(float timeDelay = 0f)
+    {
+        if (!IsColorFullyChanged)
+        {
+            StartCoroutine(ToggleSpriteRendererCoroutine(timeDelay));
+        }
+    }
+
+    private IEnumerator ToggleSpriteRendererCoroutine(float timeDelay)
+    {
+        yield return new WaitForSeconds(timeDelay);
+
+        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null && !IsColorFullyChanged)
+        {
+            spriteRenderer.enabled = !spriteRenderer.enabled;
+        }
     }
 
     // Mark the color as fully changed and update sprite state
@@ -128,6 +156,7 @@ public abstract class Enemy : MonoBehaviour, IBeamAffectable
         if (isEnemySlowed)
         {
             isEnemySlowed = false;
+            IsTakingDamage = false; // Mark as affected by beam
         }
     }
 
