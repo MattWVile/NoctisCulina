@@ -5,10 +5,6 @@ using System.Collections.Generic;
 public class PlayerLightConeCollision : MonoBehaviour
 {
     [SerializeField]
-    private float timeToDeactivateSprite = 0.7f; // Time to disable sprite after exiting light cone
-
-    private float zombieColorChangeDuration = 1.5f; // Time for zombies to fully change color
-    private float zombossColorChangeDuration = 10f; // Time for Zomboss to fully change color (much slower)
 
     private Dictionary<Zombie, Coroutine> zombieColorChangeCoroutines = new Dictionary<Zombie, Coroutine>();
     private Dictionary<Zombie, float> zombieElapsedTimes = new Dictionary<Zombie, float>();
@@ -25,11 +21,16 @@ public class PlayerLightConeCollision : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         HandleEnemyLogic(collision);
+        if (collision.CompareTag("PhotonCannon"))
+        {
+            collision.GetComponent<PhotonCannonTower>().currentAttacksPerSecond = 3;
+        }
     }
 
     private void OnTriggerStay2D(Collider2D collision)
     {
         HandleEnemyLogic(collision);
+
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -69,6 +70,11 @@ public class PlayerLightConeCollision : MonoBehaviour
                 Coroutine coroutine = StartCoroutine(DelayedSpriteDisable(zomboss));
                 zombossExitCoroutines[zomboss] = coroutine;
             }
+        }
+        else if (collision.CompareTag("PhotonCannon"))
+        {
+            PhotonCannonTower photonCannon = collision.GetComponent<PhotonCannonTower>();
+            photonCannon.currentAttacksPerSecond = photonCannon.initialAttacksPerSecond;
         }
     }
 
@@ -135,7 +141,7 @@ public class PlayerLightConeCollision : MonoBehaviour
                 spriteRenderer,
                 spriteRenderer.color,
                 Color.yellow,
-                zombieColorChangeDuration - zombieElapsedTimes[zombie],
+                zombie.colourChangeDuration - zombieElapsedTimes[zombie],
                 () =>
                 {
                     zombie.MarkColorAsFullyChanged();
@@ -149,7 +155,6 @@ public class PlayerLightConeCollision : MonoBehaviour
     {
         // Restore the zombie's speed
         zombie.ResetToMaxSpeed();
-        zombie.CurrentSpeed = zombie.MaxSpeed;
 
         // Get the SpriteRenderer component
         SpriteRenderer spriteRenderer = zombie.GetComponent<SpriteRenderer>();
@@ -196,7 +201,7 @@ public class PlayerLightConeCollision : MonoBehaviour
                 spriteRenderer,
                 spriteRenderer.color,
                 Color.yellow,
-                zombossColorChangeDuration - zombossElapsedTimes[zomboss],
+                zomboss.colourChangeDuration - zombossElapsedTimes[zomboss],
                 () =>
                 {
                     zomboss.MarkColorAsFullyChanged();

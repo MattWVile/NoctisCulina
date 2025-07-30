@@ -8,6 +8,10 @@ public class PhotonBeamCollisionHandler : MonoBehaviour
     private const float slowFactor = 4f; // Factor by which enemies are slowed down 
     private const float DamageInterval = 0.1f;
 
+
+    private Dictionary<Enemy, Coroutine> enemyColorChangeCoroutines = new Dictionary<Enemy, Coroutine>();
+    private Dictionary<Enemy, float> enemyElapsedTimes = new Dictionary<Enemy, float>();
+
     // Keeps track of every Enemy currently inside the beam
     private readonly HashSet<Enemy> _enemiesInBeam = new HashSet<Enemy>();
 
@@ -29,6 +33,9 @@ public class PhotonBeamCollisionHandler : MonoBehaviour
         {
             _enemiesInBeam.Add(enemy);
             enemy.ApplySlow(slowFactor);
+            HandleEnemyEnterOrStay(enemy);
+            enemy.IsTakingDamage = true;
+            enemy.UpdateSpriteRendererState();
         }
     }
 
@@ -37,7 +44,10 @@ public class PhotonBeamCollisionHandler : MonoBehaviour
         if (TryGetBeamTarget(other, out var enemy))
         {
             _enemiesInBeam.Remove(enemy);
-            enemy.RemoveSlow();
+            enemy.ResetToMaxSpeed();
+            HandlEnemyExit(enemy);
+            enemy.IsTakingDamage = false;
+            enemy.UpdateSpriteRendererState();
         }
     }
 
@@ -71,5 +81,68 @@ public class PhotonBeamCollisionHandler : MonoBehaviour
             return enemy != null;
         }
         return false;
+    }
+    private void HandleEnemyEnterOrStay(Enemy enemy)
+    {
+
+        // Get the SpriteRenderer component
+        SpriteRenderer spriteRenderer = enemy.GetComponent<SpriteRenderer>();
+
+        // Start the color change coroutine if not already running
+        if (spriteRenderer != null && !enemyColorChangeCoroutines.ContainsKey(enemy))
+        {
+            // Reset elapsed time if the enemy is not already transitioning
+            if (!enemyElapsedTimes.ContainsKey(enemy))
+            {
+                enemyElapsedTimes[enemy] = 0f;
+            }
+            // Start the color change coroutine
+            Coroutine coroutine = ColorChangeUtility.ChangeColorOverTime(
+                this,
+                spriteRenderer,
+                spriteRenderer.color,
+                Color.yellow,
+                enemy.colourChangeDuration - enemyElapsedTimes[enemy],
+                () =>
+                {
+                    enemy.MarkColorAsFullyChanged();
+                }
+            );
+            enemyColorChangeCoroutines[enemy] = coroutine;
+        }
+    }
+
+    private void HandlEnemyExit(Enemy enemy)
+    {
+        // Restore the zombie's speed
+        enemy.ResetToMaxSpeed();
+        enemy.IsTakingDamage = false;
+
+        // Get the SpriteRenderer component
+        SpriteRenderer spriteRenderer = enemy.GetComponent<SpriteRenderer>();
+
+        // Check if the coroutine exists before stopping it
+        if (enemyColorChangeCoroutines.ContainsKey(enemy))
+        {
+            Coroutine coroutine = enemyColorChangeCoroutines[enemy];
+            if (coroutine != null)
+            {
+                StopCoroutine(coroutine);
+            }
+            enemyColorChangeCoroutines.Remove(enemy);
+        }
+
+        // Store the remaining time if the color is not fully changed
+        if (!enemy.IsColorFullyChanged)
+        {
+            if (enemyElapsedTimes.ContainsKey(enemy))
+            {
+                enemyElapsedTimes[enemy] = Mathf.Clamp01(enemyElapsedTimes[enemy]);
+            }
+            else
+            {
+                enemyElapsedTimes[enemy] = 0f;
+            }
+        }
     }
 }

@@ -29,6 +29,10 @@ public class RangeController : MonoBehaviour
         {
             teslaTower.OnRangeTriggerEnter(other);
         }
+        else if (parentTower is PhotonCannonTower photonCannonTower)
+        {
+            photonCannonTower.OnRangeTriggerEnter(other);
+        }
     }
 
     private void OnTriggerExit2D(Collider2D other)
@@ -36,6 +40,10 @@ public class RangeController : MonoBehaviour
         if (parentTower is TeslaTower teslaTower)
         {
             teslaTower.OnRangeTriggerExit(other);
+        }
+        else if (parentTower is PhotonCannonTower photonCannonTower)
+        {
+            photonCannonTower.OnRangeTriggerExit(other);
         }
     }
 }

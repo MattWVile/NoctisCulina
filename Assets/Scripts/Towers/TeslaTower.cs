@@ -13,7 +13,7 @@ public class TeslaTower : Tower
 
     [Header("Tesla Visuals")]
     [SerializeField]
-    private float spriteActiveTime = 0.7f; // Duration the sprite is visually affected
+    private float spriteActiveTime = 3f; // Duration the sprite is visually affected
 
     // Pool for LineRenderers
     private readonly List<LineRenderer> linePool = new List<LineRenderer>();
@@ -55,7 +55,7 @@ public class TeslaTower : Tower
         ChainRange = newChainRange;
         MaxChainTargets = Mathf.Max(1, newMaxChainTargets);
         damage = newDamage;
-        attacksPerSecond = newAttacksPerSecond;
+        currentAttacksPerSecond = newAttacksPerSecond;
         MaxArcsPerEnemy = Mathf.Max(1, newMaxArcsPerEnemy);
 
         if (rangeIndicator != null)
